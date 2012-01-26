@@ -25,16 +25,13 @@
 
 #pragma once
 
-#include "targetver.h"
+#include "global/targetver.h"
 
 // excludes rarely-used stuff from windows headers
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
 #include <commctrl.h>
-
-//TODO: ONLY HERE BECAUSE OF UTIL REMOVE IT AFTER
-#include <Shellapi.h>
 
 #include <stdlib.h>
 #include <malloc.h>

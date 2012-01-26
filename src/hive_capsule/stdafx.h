@@ -32,6 +32,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <shellapi.h>
 
 #include <stdlib.h>
 #include <malloc.h>

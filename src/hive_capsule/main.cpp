@@ -29,17 +29,113 @@
 #include "ui/ui.h"
 #include "main.h"
 
-int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
-    try {
-        // sets the handler instance global value
-        hInst = handlerInstance;
+typedef enum Operations_e {
+	UNSET = 1,
+	RUN,
+	DUMP,
+	POP,
+	APPEND,
+	DUPLICATE
+} Operations;
 
-        // initializes the common controls
-        InitCommonControls();
+LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT *pNumArgs)
+{
+    int retval;
+    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
+    if (!SUCCEEDED(retval))
+        return NULL;
 
-        // registers the class
-        registerClass(handlerInstance);
+    LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
+    if (lpWideCharStr == NULL)
+        return NULL;
 
+    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
+    if (!SUCCEEDED(retval))
+    {
+        free(lpWideCharStr);
+        return NULL;
+    }
+
+    int numArgs;
+    LPWSTR* args;
+    args = CommandLineToArgvW(lpWideCharStr, &numArgs);
+    free(lpWideCharStr);
+    if (args == NULL)
+        return NULL;
+
+    int storage = numArgs * sizeof(LPSTR);
+    for (int i = 0; i < numArgs; ++ i)
+    {
+        BOOL lpUsedDefaultChar = FALSE;
+        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
+        if (!SUCCEEDED(retval))
+        {
+            LocalFree(args);
+            return NULL;
+        }
+
+        storage += retval;
+    }
+
+    LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
+    if (result == NULL)
+    {
+        LocalFree(args);
+        return NULL;
+    }
+
+    int bufLen = storage - numArgs * sizeof(LPSTR);
+    LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
+    for (int i = 0; i < numArgs; ++ i)
+    {
+        BOOL lpUsedDefaultChar = FALSE;
+        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
+        if (!SUCCEEDED(retval))
+        {
+            LocalFree(result);
+            LocalFree(args);
+            return NULL;
+        }
+
+        result[i] = buffer;
+        buffer += retval;
+        bufLen -= retval;
+    }
+
+    LocalFree(args);
+
+    *pNumArgs = numArgs;
+    return result;
+}
+
+int duplicate(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
+	char szFileName[MAX_PATH];
+	GetModuleFileName(NULL, szFileName, MAX_PATH);
+
+	CopyFile(szFileName, argv[2], FALSE);
+
+	return 0;
+}
+
+int dump(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
+	char *filePath;
+
+	if(argc > 2) {
+		filePath = argv[3];
+	} else {
+		filePath = "dump.dat";
+	}
+
+	std::ofstream dumpFile;
+	dumpFile.open(filePath);
+	CData::printData(dumpFile);
+	dumpFile.close();
+
+	return 0;
+}
+
+int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
+	try {
         // shows a message box asking for confirmation
         int returnValue = MessageBox(NULL, "You are going to install colony and the dependencies\n Continue ?", "Colony Install", MB_ICONWARNING | MB_OKCANCEL);
 
@@ -52,7 +148,7 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
 
         try {
             // tries to retrieve the python install path
-            std::string value = JBPython::getInstallPath(std::string("123"));
+            std::string value = JBPython::getInstallPath(std::string("2.7"));
         } catch(char *) {
             // creates a new colony downloader instance
             CColonyDownloader colonyDownloader = CColonyDownloader();
@@ -115,6 +211,74 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
         // returns in error
         return -1;
     }
+
+	return 0;
+}
+
+
+int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+    // sets the handler instance global value, for latter
+	// global reference (must be accessible by everyone)
+    hInst = handlerInstance;
+
+    // initializes the common controls and 
+    // registers the (handler instance) class
+    InitCommonControls();
+    registerClass(handlerInstance);
+
+	enum Operations_e operation = UNSET;
+
+	char **argv;
+	int argc;
+	argv = CommandLineToArgvA(GetCommandLineA(), &argc);
+
+	try{
+		if(argc == 1) {
+			operation = RUN;
+		} else {
+			if(!strcmp(argv[1], "run")) { operation = RUN; }
+			else if(!strcmp(argv[1], "duplicate")) { operation = DUPLICATE; }
+			else if(!strcmp(argv[1], "dump")) { operation = DUMP; }
+			else if(!strcmp(argv[1], "pop")) { operation = POP; }
+			else if(!strcmp(argv[1], "append")) { operation = APPEND; }
+			else { throw "Invalid command line option"; }
+		}
+	} catch(char *exception) {
+		std::cout << exception;
+		return -1;
+	}
+
+	switch(operation) {
+		case RUN:
+			return run(argv, argc, handlerInstance, nCmdShow);
+			break;
+
+		case DUPLICATE:
+			return duplicate(argv, argc, handlerInstance, nCmdShow);
+			break;
+
+		case DUMP:
+			return dump(argv, argc, handlerInstance, nCmdShow);
+			break;
+	}
+
+
+/*
+	struct DataFile_t dataFile;
+	memcpy(dataFile.name, "tobias", 7);
+	memcpy(dataFile.description, "", 1);
+	memcpy(dataFile.url, "http://www.iol.pt", 18);
+
+	//CData::appendDataFile("c:/capsule_d.exe", &dataFile);
+	CData::popDataFile("c:/capsule_d.exe");
+
+
+
+*/
+
+
+
+
 
     // returns normally
     return 0;

@@ -25,5 +25,6 @@
 
 #pragma once
 
+#include "data.h"
 #include "downloader.h"
 #include "observer.h"

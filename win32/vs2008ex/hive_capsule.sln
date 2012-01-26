@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_capsule", "hive_capsule.vcproj", "{9FCE3590-7E7E-4830-8E55-B503E2A3603C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FCE3590-7E7E-4830-8E55-B503E2A3603C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9FCE3590-7E7E-4830-8E55-B503E2A3603C}.Debug|Win32.Build.0 = Debug|Win32
+		{9FCE3590-7E7E-4830-8E55-B503E2A3603C}.Release|Win32.ActiveCfg = Release|Win32
+		{9FCE3590-7E7E-4830-8E55-B503E2A3603C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

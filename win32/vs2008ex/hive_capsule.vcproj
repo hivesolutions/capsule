@@ -276,14 +276,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath="..\..\src\hive_capsule\resources\win32\vs2008ex\capsule.exe.manifest"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\resources\win32\vs2008ex\capsule.rc"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Library Files"

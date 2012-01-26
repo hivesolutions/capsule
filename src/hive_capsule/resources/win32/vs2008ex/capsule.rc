@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
+#include "../../../global/resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -8,7 +8,7 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #ifndef APSTUDIO_INVOKED
-#include "targetver.h"
+#include "../../../global/targetver.h"
 #endif
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
@@ -33,7 +33,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_SMALL               ICON                    "small.ico"
+IDI_SMALL               ICON                    "capsule.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_APP_TITLE           "Hive Colony Installer"
+    IDS_APP_TITLE           "Capsule"
 END
 
 #endif    // English (U.S.) resources
@@ -112,12 +112,12 @@ BEGIN
         BLOCK "000904b0"
         BEGIN
             VALUE "CompanyName", "Hive Solutions Lda."
-            VALUE "FileDescription", "Hive Colony Installer"
+            VALUE "FileDescription", "Capsule"
             VALUE "FileVersion", "1.0.0"
-            VALUE "InternalName", "hive_col"
+            VALUE "InternalName", "capsule"
             VALUE "LegalCopyright", "Copyright (C) 2008"
-            VALUE "OriginalFilename", "hive_colony_installer.exe"
-            VALUE "ProductName", "Hive Colony Installer"
+            VALUE "OriginalFilename", "capsule.exe"
+            VALUE "ProductName", "Capsule"
             VALUE "ProductVersion", "1.0.0"
         END
     END
@@ -142,4 +142,4 @@ END
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "hive_capsule.exe.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "capsule.exe.manifest"

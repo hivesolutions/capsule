@@ -25,10 +25,8 @@
 
 #include "stdafx.h"
 
-#include <commctrl.h>
-
-#include "hive_capsule_window.h"
-#include "hive_capsule_observer.h"
+#include "../ui/ui.h"
+#include "observer.h"
 
 CColonyDownloadObserver::CColonyDownloadObserver() : JBObserver() {
     this->lastValue = 0;

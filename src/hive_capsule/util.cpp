@@ -26,9 +26,8 @@
 #include "stdafx.h"
 
 #include <shellapi.h>
-#include <string>
 
-#include "hive_capsule_util.h"
+#include "util.h"
 
 int DeleteDirectoryRecursive(const std::string &rootDirectory, bool deleteSubdirectories) {
     bool subdirectory = false;

@@ -25,9 +25,9 @@
 
 #include "stdafx.h"
 
-#include "hive_capsule_downloader.h"
-#include "hive_capsule_window.h"
-#include "hive_capsule.h"
+#include "logic/logic.h"
+#include "ui/ui.h"
+#include "main.h"
 
 int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
     try {

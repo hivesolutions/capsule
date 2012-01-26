@@ -25,14 +25,9 @@
 
 #include "stdafx.h"
 
-#include <Windows.h>
-#include <commctrl.h>
-#include <vector>
-#include <string>
-
-#include "resource.h"
-#include "hive_capsule_util.h"
-#include "hive_capsule_window.h"
+#include "../global/resource.h"
+#include "../util.h"
+#include "window.h"
 
 // the handler instance variable
 HINSTANCE hInst;

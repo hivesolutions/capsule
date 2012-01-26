@@ -25,17 +25,13 @@
 
 #include "stdafx.h"
 
-#include <string>
-#include <vector>
-#include <iostream>
-#include <fstream>
+#include "../ui/ui.h"
+#include "../util.h"
+
+#include "observer.h"
+#include "downloader.h"
 
 #include <boost/foreach.hpp>
-
-#include "hive_capsule_observer.h"
-#include "hive_capsule_util.h"
-#include "hive_capsule_window.h"
-#include "hive_capsule_downloader.h"
 
 CColonyDownloadItem::CColonyDownloadItem() {
 }

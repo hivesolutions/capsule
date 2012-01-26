@@ -177,45 +177,41 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_downloader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_observer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_util.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_window.cpp"
+				RelativePath="..\..\src\hive_capsule\main.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\hive_capsule\stdafx.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\src\hive_capsule\util.cpp"
+				>
+			</File>
+			<Filter
+				Name="Global"
+				>
+			</Filter>
+			<Filter
+				Name="Logic"
+				>
+				<File
+					RelativePath="..\..\src\hive_capsule\logic\downloader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_capsule\logic\observer.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Ui"
+				>
+				<File
+					RelativePath="..\..\src\hive_capsule\ui\window.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -223,27 +219,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_downloader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_observer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_util.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule_window.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\resource.h"
+				RelativePath="..\..\src\hive_capsule\main.h"
 				>
 			</File>
 			<File
@@ -251,9 +227,49 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hive_capsule\targetver.h"
+				RelativePath="..\..\src\hive_capsule\util.h"
 				>
 			</File>
+			<Filter
+				Name="Global"
+				>
+				<File
+					RelativePath="..\..\src\hive_capsule\global\resource.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_capsule\global\targetver.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Logic"
+				>
+				<File
+					RelativePath="..\..\src\hive_capsule\logic\downloader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_capsule\logic\logic.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_capsule\logic\observer.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Ui"
+				>
+				<File
+					RelativePath="..\..\src\hive_capsule\ui\ui.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_capsule\ui\window.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -261,15 +277,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule.exe.manifest"
+				RelativePath="..\..\src\hive_capsule\resources\win32\vs2008ex\capsule.exe.manifest"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hive_capsule\hive_capsule.rc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_capsule\small.ico"
+				RelativePath="..\..\src\hive_capsule\resources\win32\vs2008ex\capsule.rc"
 				>
 			</File>
 		</Filter>

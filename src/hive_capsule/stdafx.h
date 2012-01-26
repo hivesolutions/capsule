@@ -47,4 +47,8 @@
 
 #include <boost/foreach.hpp>
 
+#ifdef _DEBUG
+#pragma comment(lib, "jimbod.lib")
+#else
 #pragma comment(lib, "jimbo.lib")
+#endif

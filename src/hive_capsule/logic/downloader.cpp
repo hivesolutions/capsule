@@ -27,11 +27,9 @@
 
 #include "../ui/ui.h"
 #include "../util.h"
-
 #include "observer.h"
-#include "downloader.h"
 
-#include <boost/foreach.hpp>
+#include "downloader.h"
 
 CColonyDownloadItem::CColonyDownloadItem() {
 }

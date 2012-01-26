@@ -31,3 +31,5 @@
  * The file name for the python installer library.
  */
 #define HIVE_COLONY_PYTHON_INSTALLER_LIBRARY "hive_colony_python_installer.dll"
+
+int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);

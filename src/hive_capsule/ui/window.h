@@ -44,3 +44,4 @@ extern UINT changeProgressEventValue;
 DWORD WINAPI windowThread(LPVOID parameters);
 LRESULT CALLBACK WndProc(HWND handlerWindow, UINT message, WPARAM wParam, LPARAM lParam);
 int registerClass(HINSTANCE handlerInstance);
+int cancelProcess();

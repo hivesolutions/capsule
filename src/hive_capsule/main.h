@@ -42,6 +42,12 @@
 #define DEFAULT_DUMP_NAME "dump.dat"
 
 /**
+ * The default title to be shown in the installer windows
+ * when no other title overrides it by configuration.
+ */
+#define DEFAULT_WINDOW_TITLE "Capsule Installer"
+
+/**
  * The text string to be used to presetn and help
  * orientation to the final end user.
  */

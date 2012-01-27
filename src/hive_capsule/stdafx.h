@@ -25,6 +25,10 @@
 
 #pragma once
 
+#ifdef _DEBUG
+#define CS_DEBUG
+#endif
+
 #include "global/targetver.h"
 
 // excludes rarely-used stuff from windows headers
@@ -46,9 +50,7 @@
 
 #include <jimbo/jimbo.h>
 
-#include <boost/foreach.hpp>
-
-#ifdef _DEBUG
+#ifdef CS_DEBUG
 #pragma comment(lib, "jimbo_d.lib")
 #else
 #pragma comment(lib, "jimbo.lib")

@@ -26,9 +26,9 @@
 #include "stdafx.h"
 
 #include "../ui/ui.h"
-#include "../util.h"
 #include "../main.h"
 #include "observer.h"
+#include "util.h"
 
 #include "downloader.h"
 
@@ -79,13 +79,10 @@ void CSDownloader::downloadItem(CSDownloadItem &downloadItem) {
     // sets the download item in the download observer
     downloadObserver.setDownloadItem(downloadItem);
 
-    // registers the observer for the header loaded event
+    // registers the observer for the header loaded, download
+    // changed and download completed events
     httpClient.registerObserverForEvent("header_loaded", downloadObserver);
-
-    // registers the observer for the download changed event
     httpClient.registerObserverForEvent("download_changed", downloadObserver);
-
-    // registers the observer for the download completed event
     httpClient.registerObserverForEvent("download_completed", downloadObserver);
 
     // retrieves the remote contents
@@ -98,8 +95,9 @@ void CSDownloader::downloadItem(CSDownloadItem &downloadItem) {
     const char *tempPathChar = this->getTempPath().c_str();
 
     // tries to retrieve a temporary file name
-    if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName))
+    if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName)) {
         throw "Unable to create temporary file name";
+    }
 
     // opens the file for read and write
     std::fstream file = std::fstream(fileName, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
@@ -132,19 +130,21 @@ void CSDownloader::unpackItem(CSDownloadItem &downloadItem, std::string &targetP
 }
 
 void CSDownloader::generateTempPath() {
-    // allocates space for the temp path
+    // allocates space for the temp path then retrieves
+    // the local temp path (by copy) and converts it into
+    // string setting it in the current object
     char tempPath[1024];
-
-    // retrieves the local temp path
     GetTempPath(1024, tempPath);
-
     this->tempPath = std::string(tempPath);
 }
 
 std::string &CSDownloader::getTempPath() {
-    if(this->tempPath == "")
-        this->generateTempPath();
+    // in case no temp path is currently set in the object
+    // a new one must be generated (on demand generation)
+    if(this->tempPath == "") { this->generateTempPath(); }
 
+    // retrieves the current associated temp path, must be
+    // unique in the system
     return this->tempPath;
 }
 
@@ -175,7 +175,8 @@ void CSDownloader::createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow)
 }
 
 void CSDownloader::downloadFiles() {
-    BOOST_FOREACH(CSDownloadItem &downloadItem, this->downloadItems) {
+    for(size_t index = 0; index < this->downloadItems.size(); index++) {
+        CSDownloadItem &downloadItem = this->downloadItems[index];
         this->downloadItem(downloadItem);
     }
 }
@@ -214,14 +215,16 @@ std::string CSDownloader::unpackFiles(std::string targetPath) {
         this->temporaryFiles.push_back(std::string(fileName));
     }
 
-    BOOST_FOREACH(CSDownloadItem &downloadItem, this->downloadItems) {
+    for(size_t index = 0; index < this->downloadItems.size(); index++) {
+        CSDownloadItem &downloadItem = this->downloadItems[index];
         this->unpackItem(downloadItem, targetPath);
     }
 
     this->temporaryDirectories.push_back(targetPath);
 
-    // closes the window
-    SendMessage(*this->handlerWindowReference, WM_CLOSE, NULL, NULL);
+    // closes (destroy) the window in the most correct procedure
+    // this call is done to prevent pending handles
+    DestroyWindow(*this->handlerWindowReference);
 
     return targetPath;
 }
@@ -229,13 +232,17 @@ std::string CSDownloader::unpackFiles(std::string targetPath) {
 void CSDownloader::deleteTemporaryFiles() {
     JBLogger::getLogger("setup")->info("Deleting temporary files ...");
 
-    BOOST_FOREACH(std::string &temporaryDirectory, this->temporaryDirectories) {
-        DeleteDirectoryRecursiveShell(temporaryDirectory.c_str(), false);
+    for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
+        std::string &temporaryDirectory = this->temporaryDirectories[index];
+        JBWindows::deleteRecursiveShell(temporaryDirectory.c_str(), false);
     }
 
-    BOOST_FOREACH(std::string &temporaryFile, this->temporaryFiles) {
+    for(size_t index = 0; index < this->temporaryFiles.size(); index++) {
+        std::string &temporaryFile = this->temporaryFiles[index];
         DeleteFile(temporaryFile.c_str());
     }
+
+    JBLogger::getLogger("setup")->info("Finished deleting temporary files");
 }
 
 void CSDownloader::setBaseDownloadAddress(std::string &baseDownloadAddress){

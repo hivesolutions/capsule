@@ -25,6 +25,40 @@
 
 #include "stdafx.h"
 
-#include <shellapi.h>
-
 #include "util.h"
+
+#ifdef CS_DEBUG
+void CSUtil::sartLogger() {
+    JBLogger *logger = JBLogger::getLogger("setup");
+    JBLoggerFileHandler *fileHandler = new JBLoggerFileHandler(std::string("setup.log"));
+    logger->addHandler(fileHandler);
+    logger->setLevel(DEBUG);
+    logger->info("Log system started");
+}
+
+void CSUtil::startConsole() {
+    // allocates the console interface in the windows
+    // sub system and attaches it to the curren process
+    AllocConsole();
+
+    // saves the various default stream files into temporary
+    // variables to be able to use them as value references
+    FILE *_stdin = stdin;
+    FILE *_stdout = stdout;
+    FILE *_stderr = stderr;
+
+    // reopens the standard input, output and error files
+    // and sets then to the console input and output systems
+    freopen_s(&_stdin, "CONIN$", "rb", stdin);
+    freopen_s(&_stdout, "CONOUT$", "wb", stdout);
+    freopen_s(&_stderr, "CONOUT$", "wb", stderr);
+}
+
+void CSUtil::stopConsole() {
+    FreeConsole();
+}
+#else
+void CSUtil::sartLogger() { }
+void CSUtil::startConsole() { }
+void CSUtil::stopConsole() { }
+#endif

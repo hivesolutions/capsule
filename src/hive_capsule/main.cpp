@@ -39,114 +39,21 @@ typedef enum Operations_e {
     DUMP
 } Operations;
 
-LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT *pNumArgs)
-{
-    int retval;
-    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
-    if (!SUCCEEDED(retval))
-        return NULL;
-
-    LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
-    if (lpWideCharStr == NULL)
-        return NULL;
-
-    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
-    if (!SUCCEEDED(retval))
-    {
-        free(lpWideCharStr);
-        return NULL;
-    }
-
-    int numArgs;
-    LPWSTR* args;
-    args = CommandLineToArgvW(lpWideCharStr, &numArgs);
-    free(lpWideCharStr);
-    if (args == NULL)
-        return NULL;
-
-    int storage = numArgs * sizeof(LPSTR);
-    for (int index = 0; index < numArgs; ++index)
-    {
-        BOOL lpUsedDefaultChar = FALSE;
-        retval = WideCharToMultiByte(CP_ACP, 0, args[index], -1, NULL, 0, NULL, &lpUsedDefaultChar);
-        if (!SUCCEEDED(retval))
-        {
-            LocalFree(args);
-            return NULL;
-        }
-
-        storage += retval;
-    }
-
-    LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
-    if (result == NULL)
-    {
-        LocalFree(args);
-        return NULL;
-    }
-
-    int bufLen = storage - numArgs * sizeof(LPSTR);
-    LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
-    for (int index = 0; index < numArgs; ++index) {
-        BOOL lpUsedDefaultChar = FALSE;
-        retval = WideCharToMultiByte(CP_ACP, 0, args[index], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
-        if(!SUCCEEDED(retval)) {
-            LocalFree(result);
-            LocalFree(args);
-            return NULL;
-        }
-
-        result[index] = buffer;
-        buffer += retval;
-        bufLen -= retval;
-    }
-
-    LocalFree(args);
-
-    *pNumArgs = numArgs;
-    return result;
-}
-
-void sartLogger() {
-    JBLogger *logger = JBLogger::getLogger("setup");
-    JBLoggerFileHandler *fileHandler = new JBLoggerFileHandler(std::string("setup.log"));
-    logger->addHandler(fileHandler);
-    logger->setLevel(DEBUG);
-    logger->info("Log system started");
-}
-
-void startConsole() {
-    // allocates the console interface in the windows
-    // sub system and attaches it to the curren process
-    AllocConsole();
-
-    // saves the various default stream files into temporary
-    // variables to be able to use them as value references
-    FILE *_stdin = stdin;
-    FILE *_stdout = stdout;
-    FILE *_stderr = stderr;
-
-    // reopens the standard input, output and error files
-    // and sets then to the console input and output systems
-    freopen_s(&_stdin, "CONIN$", "rb", stdin);
-    freopen_s(&_stdout, "CONOUT$", "wb", stdout);
-    freopen_s(&_stderr, "CONOUT$", "wb", stderr);
-}
-
-void stopConsole() {
-    FreeConsole();
-}
-
 int help(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
-    MessageBox(NULL, HELP_SUPPORT_MESSAGE, "Capsule", MB_ICONINFORMATION | MB_OK);
+    MessageBox(NULL, HELP_SUPPORT_MESSAGE, DEFAULT_WINDOW_TITLE, MB_ICONINFORMATION | MB_OK);
     return 0;
 }
 
 int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     // shows a message box asking for confirmation
-    int returnValue = MessageBox(NULL, "You are going to install capsule and the dependencies\n Continue ?", "Capsule Installer", MB_ICONWARNING | MB_OKCANCEL);
+    int returnValue = MessageBox(
+        NULL,
+        "You are going to install capsule and the dependencies\n Continue ?",
+        DEFAULT_WINDOW_TITLE,
+        MB_ICONWARNING | MB_OKCANCEL
+    );
 
-    // in case the retur from the message box is cancel, the installer
+    // in case the return from the message box is cancel, the installer
     // process must be aborted immediately
     if(returnValue == IDCANCEL) {
         // returns in error
@@ -314,12 +221,12 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
 
     // starts the console to allow output and input
     // from the default interaction mechanisms
-    startConsole();
+    CSUtil::startConsole();
 
     // starts the logger sub system, the logger level
     // is dependent in thje current run mode, debug mode
     // sets an higher level of verbosity
-    sartLogger();
+    CSUtil::sartLogger();
 
     // initializes the common controls and
     // registers the (handler instance) class
@@ -330,7 +237,11 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
     // to be executed for the current context
     enum Operations_e operation = UNSET;
 
-    argv = CommandLineToArgvA(GetCommandLineA(), &argc);
+    // retrieves the current command line and unpacks it into
+    // the array of commands provided, it's important to respect
+    // the default string escaping sequences
+    char *commandLine = GetCommandLineA();
+    argv = JBWindows::commandLineToArgv(commandLine, &argc);
 
     try {
         if(argc == 1) {
@@ -345,21 +256,16 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
             else if(!strcmp(argv[1], "dump")) { operation = DUMP; }
             else { throw "Invalid command line option"; }
         }
-    } catch(char *exception) {
-        std::cout << exception;
-        return -1;
-    }
 
-    try {
         call(operation, argv, argc, handlerInstance, nCmdShow);
     } catch(char *exception) {
-        int returnValue = MessageBox(NULL, (std::string("Problem in capsule:\n\n") + exception).c_str() , "Installation error", MB_ICONERROR | MB_OK);
+        int returnValue = MessageBox(NULL, (std::string("Error:\n") + exception).c_str() , "Installation error", MB_ICONERROR | MB_OK);
         return -1;
     }
 
     // stops the console system, releasing all the remaining
     // resources in the associated system
-    startConsole();
+    CSUtil::stopConsole();
 
     // returns normally
     return 0;

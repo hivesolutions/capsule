@@ -25,7 +25,9 @@
 
 #pragma once
 
-#include "data.h"
-#include "downloader.h"
-#include "observer.h"
-#include "util.h"
+class CSUtil {
+    public:
+        static void sartLogger();
+        static void startConsole();
+        static void stopConsole();
+};

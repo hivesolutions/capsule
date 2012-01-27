@@ -26,7 +26,7 @@
 #include "stdafx.h"
 
 #include "../global/resource.h"
-#include "../util.h"
+#include "../main.h"
 #include "window.h"
 
 // the handler instance variable
@@ -63,21 +63,27 @@ DWORD WINAPI windowThread(void *parameters) {
     // retrieves the window event
     HANDLE windowEvent = (HANDLE) threadArguments[3];
 
-    // retrieves the current screen width
+    // retrieves the current screen width and height for centering
+    // window calculation
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-
-    // retrieves the current screen height
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    // calculates the x position of the window to be centered
+    // calculates the x and y positions of the window and makes
+    // sure it kees centered in the screen
     int windowX = (screenWidth / 2) - (DOWNLOAD_WINDOW_WIDTH / 2);
-
-    // calculates the y position of the window to be centered
     int windowY = (screenHeight / 2) - (DOWNLOAD_WINDOW_HEIGHT / 2);
 
     // creates a new window to represent the download progress
-    HWND handlerWindow = CreateWindow("defaultWindow", "Capsule Installer", WS_BORDER | WS_CAPTION | WS_SYSMENU, windowX,
-                                      windowY, DOWNLOAD_WINDOW_WIDTH, DOWNLOAD_WINDOW_HEIGHT, NULL, NULL, handlerInstance, NULL);
+    HWND handlerWindow = CreateWindow(
+        "defaultWindow",
+        DEFAULT_WINDOW_TITLE,
+        WS_BORDER | WS_CAPTION | WS_SYSMENU,
+        windowX, windowY, DOWNLOAD_WINDOW_WIDTH, DOWNLOAD_WINDOW_HEIGHT,
+        NULL,
+        NULL,
+        handlerInstance,
+        NULL
+    );
 
     // sets the handler window reference
     *handlerWindowReference = &handlerWindow;
@@ -137,26 +143,58 @@ LRESULT CALLBACK WindowProc(HWND handlerWindow, UINT message, WPARAM wParam, LPA
                 SendMessage(handlerProgress, WM_CLOSE, NULL, NULL);
 
                 // creates the progress bar retrieving the handler to the progress bar
-                handlerProgress = CreateWindowEx(NULL, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE | PBS_SMOOTH, 20, 60, 455, 17, handlerWindow, NULL, hInst, NULL);
+                handlerProgress = CreateWindowEx(
+                    NULL,
+                    PROGRESS_CLASS,
+                    NULL,
+                    WS_CHILD | WS_VISIBLE | PBS_SMOOTH,
+                    20, 60, 455, 17,
+                    handlerWindow,
+                    NULL,
+                    hInst,
+                    NULL
+                );
+
             case 2:
                 // sends a message to close the progress bar
                 SendMessage(handlerProgress, WM_CLOSE, NULL, NULL);
 
                 // creates the progress bar retrieving the handler to the progress bar
-                handlerProgress = CreateWindowEx(NULL, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE | PBS_MARQUEE, 20, 60, 455, 17, handlerWindow, NULL, hInst, NULL);
+                handlerProgress = CreateWindowEx(
+                    NULL,
+                    PROGRESS_CLASS,
+                    NULL,
+                    WS_CHILD | WS_VISIBLE | PBS_MARQUEE,
+                    20, 60, 455, 17,
+                    handlerWindow,
+                    NULL,
+                    hInst,
+                    NULL
+                );
 
                 // sends a message to start the marquee progress bar
                 SendMessage(handlerProgress, PBM_SETMARQUEE, 100, NULL);
+
             default:
                 break;
         }
     }
 
-    // switches in the messa value
+    // switches over the windows the message value
     switch(message) {
         case WM_CREATE:
             // creates the progress bar retrieving the handler to the progress bar
-            handlerProgress = CreateWindowEx(NULL, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE | PBS_SMOOTH, 20, 60, 455, 17, handlerWindow, NULL, hInst, NULL);
+            handlerProgress = CreateWindowEx(
+                NULL,
+                PROGRESS_CLASS,
+                NULL,
+                WS_CHILD | WS_VISIBLE | PBS_SMOOTH,
+                20, 60, 455, 17,
+                handlerWindow,
+                NULL,
+                hInst,
+                NULL
+            );
 
             // registers the change label message event
             changeLabelEventValue = RegisterWindowMessage("changeLabel");
@@ -168,6 +206,7 @@ LRESULT CALLBACK WindowProc(HWND handlerWindow, UINT message, WPARAM wParam, LPA
             changeProgressEventValue = RegisterWindowMessage("changeProgress");
 
             break;
+
         case WM_COMMAND:
             // retrieves the command id
             wmId = LOWORD(wParam);
@@ -176,6 +215,7 @@ LRESULT CALLBACK WindowProc(HWND handlerWindow, UINT message, WPARAM wParam, LPA
             wmEvent = HIWORD(wParam);
 
             break;
+
         case WM_PAINT:
             // retrieves the paint context of the handler
             handlerDc = BeginPaint(handlerWindow, &paintStructure);
@@ -184,7 +224,7 @@ LRESULT CALLBACK WindowProc(HWND handlerWindow, UINT message, WPARAM wParam, LPA
             SetBkMode(handlerDc, TRANSPARENT);
 
             // retrieves the windows major version value
-            if(GetWindowsMajorVersion() > 5) {
+            if(JBWindows::getVersion() > 5) {
                 // sets the non client metrics size
                 nonClientMetrics.cbSize = sizeof(NONCLIENTMETRICS);
 
@@ -212,11 +252,20 @@ LRESULT CALLBACK WindowProc(HWND handlerWindow, UINT message, WPARAM wParam, LPA
             EndPaint(handlerWindow, &paintStructure);
 
             break;
+
         case WM_DESTROY:
             // sends the post quit message
             PostQuitMessage(0);
 
             break;
+
+        case WM_CLOSE:
+            // tries to cancel the current process
+            // (interrogates the user about it)
+            cancelProcess();
+
+            break;
+
         default:
             return DefWindowProc(handlerWindow, message, wParam, lParam);
     }
@@ -241,4 +290,28 @@ int registerClass(HINSTANCE handlerInstance) {
     windowClassEx.lpszClassName = "defaultWindow";
 
     return RegisterClassEx(&windowClassEx);
+}
+
+int cancelProcess() {
+    // shows a message box asking for confirmation
+    // on the canceling of the installation
+    int returnValue = MessageBox(
+        NULL,
+        "Are you sure you want to cancel installation",
+        DEFAULT_WINDOW_TITLE,
+        MB_ICONWARNING | MB_OKCANCEL
+    );
+
+    // in case the return from the message box is cancel, the installer
+    // process continues from where it was
+    if(returnValue == IDCANCEL) {
+        // returns immediately with no error
+        // set (no problems)
+        return 0;
+    }
+
+    // exits the current process in an error state, this
+    // should be considered an erroneous situation, (this
+    // should be able to provide some garbage collection)
+    exit(-1);
 }

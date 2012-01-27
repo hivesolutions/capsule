@@ -200,10 +200,6 @@
                     />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\..\src\hive_capsule\util.cpp"
-                >
-            </File>
             <Filter
                 Name="Global"
                 >
@@ -221,6 +217,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_capsule\logic\observer.cpp"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_capsule\logic\util.cpp"
                     >
                 </File>
             </Filter>
@@ -244,10 +244,6 @@
             </File>
             <File
                 RelativePath="..\..\src\hive_capsule\stdafx.h"
-                >
-            </File>
-            <File
-                RelativePath="..\..\src\hive_capsule\util.h"
                 >
             </File>
             <Filter
@@ -279,6 +275,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_capsule\logic\observer.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_capsule\logic\util.h"
                     >
                 </File>
             </Filter>

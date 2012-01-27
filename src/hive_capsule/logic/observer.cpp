@@ -61,7 +61,9 @@ void CSDownloadObserver::update(JBObservable &element, std::string &eventName, v
         std::string *message = new std::string("Transfering " + this->downloadItem.getDescription());
 
         // sends the message to change the label string of the window
+        // and also sets the progress handler to the original (start position)
         SendMessage(this->windowHandler, changeLabelStringEventValue, (WPARAM) message, NULL);
+        SendMessage(this->progressHandler, PBM_SETPOS, 0, NULL);
 
         // invalidates the window rectangle
         InvalidateRect(this->windowHandler, NULL, true);

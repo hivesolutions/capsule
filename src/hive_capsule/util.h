@@ -24,7 +24,3 @@
 // __license__   = GNU General Public License (GPL), Version 3
 
 #pragma once
-
-int DeleteDirectoryRecursive(const std::string &rootDirectory, bool deleteSubdirectories) ;
-int DeleteDirectoryRecursiveShell(const char *targetDirectory, bool recycleBin);
-int GetWindowsMajorVersion();

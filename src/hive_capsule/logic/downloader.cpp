@@ -27,6 +27,7 @@
 
 #include "../ui/ui.h"
 #include "../util.h"
+#include "../main.h"
 #include "observer.h"
 
 #include "downloader.h"
@@ -226,6 +227,8 @@ std::string CColonyDownloader::unpackFiles(std::string targetPath) {
 }
 
 void CColonyDownloader::deleteTemporaryFiles() {
+    JBLogger::getLogger("setup")->info("Deleting temporary files ...");
+
     BOOST_FOREACH(std::string &temporaryDirectory, this->temporaryDirectories) {
         DeleteDirectoryRecursiveShell(temporaryDirectory.c_str(), false);
     }
@@ -244,7 +247,7 @@ void CColonyDownloader::addDownloadItem(CColonyDownloadItem &colonyDownloadItem)
 }
 
 CColonyDownloadItem &CColonyDownloader::addDownloadFile(std::string &name, std::string &description) {
-    CColonyDownloadItem    colonyDownloadItem = CColonyDownloadItem(name, description, this->baseDownloadAddress + "/" + name);
+    CColonyDownloadItem colonyDownloadItem = CColonyDownloadItem(name, description, this->baseDownloadAddress + "/" + name);
 
     this->downloadItems.push_back(colonyDownloadItem);
 

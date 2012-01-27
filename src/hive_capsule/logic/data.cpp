@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Hive Colony Framework. If not, see <http://www.gnu.org/licenses/>.
 
-// __author__    = Jo„o Magalh„es <joamag@hive.pt>
+// __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
 // __version__   = 1.0.0
 // __revision__  = $LastChangedRevision$
 // __date__      = $LastChangedDate$
@@ -28,131 +28,131 @@
 #include "data.h"
 
 struct Data_t *CData::getData() {
-	char szFileName[MAX_PATH];
-	GetModuleFileName(NULL, szFileName, MAX_PATH);
-	return CData::getData(szFileName);
+    char szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    return CData::getData(szFileName);
 }
 
 struct Data_t *CData::getData(char *filePath) {
-	struct Data_t *data;
+    struct Data_t *data;
 
-	HMODULE library = LoadLibrary(filePath);
-	if(library == NULL) {
-		throw "Invalid data path";
-	}
+    HMODULE library = LoadLibrary(filePath);
+    if(library == NULL) {
+        throw "Invalid data path";
+    }
 
-	HRSRC resourcePath = FindResource(library, "DATA", RT_RCDATA);
+    HRSRC resourcePath = FindResource(library, "DATA", RT_RCDATA);
 
-	size_t dataSize = sizeof(struct Data_t);
-	data = (struct Data_t *) malloc(dataSize);
+    size_t dataSize = sizeof(struct Data_t);
+    data = (struct Data_t *) malloc(dataSize);
 
-	if (resourcePath == NULL) {
-		memset(data, 0, dataSize);
-		data->numberFiles = 0;
-	} else {
-		HGLOBAL resource = LoadResource(library, resourcePath);
-		struct Data_t *_data = (struct Data_t *) LockResource(resource);
-		memcpy(data, _data, dataSize);
-	}
+    if (resourcePath == NULL) {
+        memset(data, 0, dataSize);
+        data->numberFiles = 0;
+    } else {
+        HGLOBAL resource = LoadResource(library, resourcePath);
+        struct Data_t *_data = (struct Data_t *) LockResource(resource);
+        memcpy(data, _data, dataSize);
+    }
 
-	FreeLibrary(library);
+    FreeLibrary(library);
 
-	return data;
+    return data;
 }
 
 void CData::setData(struct Data_t *data) {
-	char szFileName[MAX_PATH];
-	GetModuleFileName(NULL, szFileName, MAX_PATH);
-	CData::setData(szFileName, data);
+    char szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    CData::setData(szFileName, data);
 }
 
 void CData::setData(char *filePath, struct Data_t *data) {
-	size_t dataSize = sizeof(Data_t);
+    size_t dataSize = sizeof(Data_t);
 
-	HANDLE tobias = BeginUpdateResource(filePath, false);
-	BOOL success = UpdateResource(tobias, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, dataSize);
-	if(success == TRUE) {
-		EndUpdateResource(tobias, FALSE);
-	}
+    HANDLE tobias = BeginUpdateResource(filePath, false);
+    BOOL success = UpdateResource(tobias, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, dataSize);
+    if(success == TRUE) {
+        EndUpdateResource(tobias, FALSE);
+    }
 }
 
 void CData::appendDataFile(struct DataFile_t *dataFile) {
-	char szFileName[MAX_PATH];
-	GetModuleFileName(NULL, szFileName, MAX_PATH);
-	CData::appendDataFile(szFileName, dataFile);
+    char szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    CData::appendDataFile(szFileName, dataFile);
 }
 
 void CData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {
-	struct Data_t *data = CData::getData(filePath);
+    struct Data_t *data = CData::getData(filePath);
 
-	if(data->numberFiles == DATA_FILE_COUNT) {
-		throw "No more space available in the data file";
-	}
-	
-	memcpy(&data->dataFiles[data->numberFiles], dataFile, sizeof(struct DataFile_t));
-	data->numberFiles++;
+    if(data->numberFiles == DATA_FILE_COUNT) {
+        throw "No more space available in the data file";
+    }
 
-	CData::setData(filePath, data);
+    memcpy(&data->dataFiles[data->numberFiles], dataFile, sizeof(struct DataFile_t));
+    data->numberFiles++;
 
-	free(data);
+    CData::setData(filePath, data);
+
+    free(data);
 }
 
 void CData::popDataFile() {
-	char szFileName[MAX_PATH];
-	GetModuleFileName(NULL, szFileName, MAX_PATH);
-	CData::popDataFile(szFileName);
+    char szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    CData::popDataFile(szFileName);
 }
 
 void CData::popDataFile(char *filePath) {
-	struct Data_t *data = CData::getData(filePath);
+    struct Data_t *data = CData::getData(filePath);
 
-	if(data->numberFiles == 0) {
-		throw "No more data files available to pop";
-	}
-	
-	memset(&data->dataFiles[data->numberFiles - 1], 0, sizeof(struct DataFile_t));
-	data->numberFiles--;
+    if(data->numberFiles == 0) {
+        throw "No more data files available to pop";
+    }
 
-	CData::setData(filePath, data);
+    memset(&data->dataFiles[data->numberFiles - 1], 0, sizeof(struct DataFile_t));
+    data->numberFiles--;
 
-	free(data);
+    CData::setData(filePath, data);
+
+    free(data);
 }
 
 void CData::printDataFile(char *filePath, size_t index) {
-	CData::printDataFile(filePath, index, std::cout);
+    CData::printDataFile(filePath, index, std::cout);
 }
 
 void CData::printDataFile(char *filePath, size_t index, std::ostream &stream) {
-	struct Data_t *data = CData::getData(filePath);
+    struct Data_t *data = CData::getData(filePath);
 
-	if(index > data->numberFiles - 1) {
-		throw "Data file index not found in data";
-	}
+    if(index > data->numberFiles - 1) {
+        throw "Data file index not found in data";
+    }
 
-	struct DataFile_t *dataFile = &data->dataFiles[index];
+    struct DataFile_t *dataFile = &data->dataFiles[index];
 
-	stream << "Name => '" << dataFile->name << "'\n";
-	stream << "Description => '" << dataFile->description << "'\n";
-	stream << "URL => '" << dataFile->url << "'\n";
+    stream << "Name => '" << dataFile->name << "'\n";
+    stream << "Description => '" << dataFile->description << "'\n";
+    stream << "URL => '" << dataFile->url << "'\n";
 
-	free(data);
+    free(data);
 }
 
 void CData::printData(std::ostream &stream) {
-	char szFileName[MAX_PATH];
-	GetModuleFileName(NULL, szFileName, MAX_PATH);
-	CData::printData(szFileName, stream);
+    char szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    CData::printData(szFileName, stream);
 }
 
 void CData::printData(char *filePath, std::ostream &stream) {
-	struct Data_t *data = CData::getData(filePath);
+    struct Data_t *data = CData::getData(filePath);
 
-	bool isFirst = true;
+    bool isFirst = true;
 
-	for(size_t index = 0; index < data->numberFiles; index++) {
-		if(isFirst) { isFirst = false; } else { stream << "\n"; }
-		CData::printDataFile(filePath, index, stream);
-	}
+    for(size_t index = 0; index < data->numberFiles; index++) {
+        if(isFirst) { isFirst = false; } else { stream << "\n"; }
+        CData::printDataFile(filePath, index, stream);
+    }
 
-	free(data);
+    free(data);
 }

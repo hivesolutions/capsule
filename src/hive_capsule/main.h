@@ -28,6 +28,20 @@
 #include "global/resource.h"
 
 /**
+ * The default name to be used used for generation
+ * of duplicated (cloned) capsule files.
+ * This name must be able to correclty identify
+ * an installer file.
+ */
+#define DEFAULT_SETUP_NAME "setup.exe"
+
+/**
+ * The default name to be used used for generation
+ * of the dump data files.
+ */
+#define DEFAULT_DUMP_NAME "dump.dat"
+
+/**
  * The file name for the python installer library.
  */
 #define HIVE_COLONY_PYTHON_INSTALLER_LIBRARY "hive_colony_python_installer.dll"

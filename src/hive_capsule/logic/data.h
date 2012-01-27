@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Hive Capsule Installer. If not, see <http://www.gnu.org/licenses/>.
 
-// __author__    = Jo„o Magalh„es <joamag@hive.pt>
+// __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
 // __version__   = 1.0.0
 // __revision__  = $LastChangedRevision$
 // __date__      = $LastChangedDate$
@@ -33,28 +33,28 @@
 #define DATA_FILE_COUNT 8
 
 typedef struct DataFile_t {
-	char name[256];
-	char description[256];
-	char url[2048];
+    char name[256];
+    char description[256];
+    char url[2048];
 } DataFile;
 
 typedef struct Data_t {
-	size_t numberFiles;
-	struct DataFile_t dataFiles[DATA_FILE_COUNT];
+    size_t numberFiles;
+    struct DataFile_t dataFiles[DATA_FILE_COUNT];
 } Data;
 
 class CData {
     public:
-		static struct Data_t *getData();
-		static struct Data_t *getData(char *filePath);
-		static void setData(struct Data_t *data);
-		static void setData(char *filePath, struct Data_t *data);
-		static void appendDataFile(struct DataFile_t *dataFile);
+        static struct Data_t *getData();
+        static struct Data_t *getData(char *filePath);
+        static void setData(struct Data_t *data);
+        static void setData(char *filePath, struct Data_t *data);
+        static void appendDataFile(struct DataFile_t *dataFile);
         static void appendDataFile(char *filePath, struct DataFile_t *dataFile);
-		static void popDataFile();
-		static void popDataFile(char *filePath);
-		static void printDataFile(char *filePath, size_t index);
-		static void printDataFile(char *filePath, size_t index, std::ostream &stream);
-		static void printData(std::ostream &stream);
-		static void printData(char *filePath, std::ostream &stream);
+        static void popDataFile();
+        static void popDataFile(char *filePath);
+        static void printDataFile(char *filePath, size_t index);
+        static void printDataFile(char *filePath, size_t index, std::ostream &stream);
+        static void printData(std::ostream &stream);
+        static void printData(char *filePath, std::ostream &stream);
 };

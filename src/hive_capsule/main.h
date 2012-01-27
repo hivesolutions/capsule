@@ -42,8 +42,20 @@
 #define DEFAULT_DUMP_NAME "dump.dat"
 
 /**
- * The file name for the python installer library.
+ * The text string to be used to presetn and help
+ * orientation to the final end user.
  */
-#define HIVE_COLONY_PYTHON_INSTALLER_LIBRARY "hive_colony_python_installer.dll"
+#define HELP_SUPPORT_MESSAGE "HELP:\n\n\
+capsule run\n\
+   Normal execution of the capsule installation system\n\n\
+capsule duplicate <target>\n\
+capsule clone <target>\n\
+    Duplicates the current file creating an exact copy\n\n\
+capsule append <target> name description url\n\
+    Adds a data information file to the capsule file, may be used for runtime\n\n\
+capsule pop\n\
+    Removes the last data information file present in the capsule file\n\n\
+capsule dump <file>\n\
+    Removes the last data information file present in the capsule file"
 
 int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);

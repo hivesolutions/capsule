@@ -31,6 +31,7 @@
 
 typedef enum Operations_e {
     UNSET = 1,
+	HELP,
     RUN,
     DUPLICATE,
     APPEND,
@@ -134,6 +135,11 @@ void startConsole() {
 
 void stopConsole() {
     FreeConsole();
+}
+
+int help(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
+	MessageBox(NULL, HELP_SUPPORT_MESSAGE, "Capsule", MB_OK);
+    return 0;
 }
 
 int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
@@ -294,7 +300,8 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
         if(argc == 1) {
             operation = RUN;
         } else {
-            if(!strcmp(argv[1], "run")) { operation = RUN; }
+			if(!strcmp(argv[1], "help")) { operation = HELP; }
+            else if(!strcmp(argv[1], "run")) { operation = RUN; }
             else if(!strcmp(argv[1], "duplicate")) { operation = DUPLICATE; }
             else if(!strcmp(argv[1], "clone")) { operation = DUPLICATE; }
             else if(!strcmp(argv[1], "append")) { operation = APPEND; }
@@ -308,6 +315,10 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
     }
 
     switch(operation) {
+        case HELP:
+            return help(argv, argc, handlerInstance, nCmdShow);
+            break;
+
         case RUN:
             return run(argv, argc, handlerInstance, nCmdShow);
             break;

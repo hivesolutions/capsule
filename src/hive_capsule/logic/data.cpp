@@ -1,20 +1,20 @@
-// Hive Colony Framework
+// Hive Capsule Installer
 // Copyright (C) 2008 Hive Solutions Lda.
 //
-// This file is part of Hive Colony Framework.
+// This file is part of Hive Capsule Installer.
 //
-// Hive Colony Framework is free software: you can redistribute it and/or modify
+// Hive Capsule Installer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Hive Colony Framework is distributed in the hope that it will be useful,
+// Hive Capsule Installer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Hive Colony Framework. If not, see <http://www.gnu.org/licenses/>.
+// along with Hive Capsule Installer. If not, see <http://www.gnu.org/licenses/>.
 
 // __author__    = João Magalhães <joamag@hive.pt>
 // __version__   = 1.0.0
@@ -27,13 +27,13 @@
 
 #include "data.h"
 
-struct Data_t *CData::getData() {
+struct Data_t *CSData::getData() {
     char szFileName[MAX_PATH];
     GetModuleFileName(NULL, szFileName, MAX_PATH);
-    return CData::getData(szFileName);
+    return CSData::getData(szFileName);
 }
 
-struct Data_t *CData::getData(char *filePath) {
+struct Data_t *CSData::getData(char *filePath) {
     struct Data_t *data;
 
     HMODULE library = LoadLibrary(filePath);
@@ -60,13 +60,13 @@ struct Data_t *CData::getData(char *filePath) {
     return data;
 }
 
-void CData::setData(struct Data_t *data) {
+void CSData::setData(struct Data_t *data) {
     char szFileName[MAX_PATH];
     GetModuleFileName(NULL, szFileName, MAX_PATH);
-    CData::setData(szFileName, data);
+    CSData::setData(szFileName, data);
 }
 
-void CData::setData(char *filePath, struct Data_t *data) {
+void CSData::setData(char *filePath, struct Data_t *data) {
     size_t dataSize = sizeof(Data_t);
 
     HANDLE tobias = BeginUpdateResource(filePath, false);
@@ -76,14 +76,14 @@ void CData::setData(char *filePath, struct Data_t *data) {
     }
 }
 
-void CData::appendDataFile(struct DataFile_t *dataFile) {
+void CSData::appendDataFile(struct DataFile_t *dataFile) {
     char szFileName[MAX_PATH];
     GetModuleFileName(NULL, szFileName, MAX_PATH);
-    CData::appendDataFile(szFileName, dataFile);
+    CSData::appendDataFile(szFileName, dataFile);
 }
 
-void CData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {
-    struct Data_t *data = CData::getData(filePath);
+void CSData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {
+    struct Data_t *data = CSData::getData(filePath);
 
     if(data->numberFiles == DATA_FILE_COUNT) {
         throw "No more space available in the data file";
@@ -92,19 +92,19 @@ void CData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {
     memcpy(&data->dataFiles[data->numberFiles], dataFile, sizeof(struct DataFile_t));
     data->numberFiles++;
 
-    CData::setData(filePath, data);
+    CSData::setData(filePath, data);
 
     free(data);
 }
 
-void CData::popDataFile() {
+void CSData::popDataFile() {
     char szFileName[MAX_PATH];
     GetModuleFileName(NULL, szFileName, MAX_PATH);
-    CData::popDataFile(szFileName);
+    CSData::popDataFile(szFileName);
 }
 
-void CData::popDataFile(char *filePath) {
-    struct Data_t *data = CData::getData(filePath);
+void CSData::popDataFile(char *filePath) {
+    struct Data_t *data = CSData::getData(filePath);
 
     if(data->numberFiles == 0) {
         throw "No more data files available to pop";
@@ -113,17 +113,17 @@ void CData::popDataFile(char *filePath) {
     memset(&data->dataFiles[data->numberFiles - 1], 0, sizeof(struct DataFile_t));
     data->numberFiles--;
 
-    CData::setData(filePath, data);
+    CSData::setData(filePath, data);
 
     free(data);
 }
 
-void CData::printDataFile(char *filePath, size_t index) {
-    CData::printDataFile(filePath, index, std::cout);
+void CSData::printDataFile(char *filePath, size_t index) {
+    CSData::printDataFile(filePath, index, std::cout);
 }
 
-void CData::printDataFile(char *filePath, size_t index, std::ostream &stream) {
-    struct Data_t *data = CData::getData(filePath);
+void CSData::printDataFile(char *filePath, size_t index, std::ostream &stream) {
+    struct Data_t *data = CSData::getData(filePath);
 
     if(index > data->numberFiles - 1) {
         throw "Data file index not found in data";
@@ -138,20 +138,20 @@ void CData::printDataFile(char *filePath, size_t index, std::ostream &stream) {
     free(data);
 }
 
-void CData::printData(std::ostream &stream) {
+void CSData::printData(std::ostream &stream) {
     char szFileName[MAX_PATH];
     GetModuleFileName(NULL, szFileName, MAX_PATH);
-    CData::printData(szFileName, stream);
+    CSData::printData(szFileName, stream);
 }
 
-void CData::printData(char *filePath, std::ostream &stream) {
-    struct Data_t *data = CData::getData(filePath);
+void CSData::printData(char *filePath, std::ostream &stream) {
+    struct Data_t *data = CSData::getData(filePath);
 
     bool isFirst = true;
 
     for(size_t index = 0; index < data->numberFiles; index++) {
         if(isFirst) { isFirst = false; } else { stream << "\n"; }
-        CData::printDataFile(filePath, index, stream);
+        CSData::printDataFile(filePath, index, stream);
     }
 
     free(data);

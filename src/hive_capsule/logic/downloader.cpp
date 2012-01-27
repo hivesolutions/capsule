@@ -1,20 +1,20 @@
-// Hive Colony Framework
+// Hive Capsule Installer
 // Copyright (C) 2008 Hive Solutions Lda.
 //
-// This file is part of Hive Colony Framework.
+// This file is part of Hive Capsule Installer.
 //
-// Hive Colony Framework is free software: you can redistribute it and/or modify
+// Hive Capsule Installer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Hive Colony Framework is distributed in the hope that it will be useful,
+// Hive Capsule Installer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Hive Colony Framework. If not, see <http://www.gnu.org/licenses/>.
+// along with Hive Capsule Installer. If not, see <http://www.gnu.org/licenses/>.
 
 // __author__    = João Magalhães <joamag@hive.pt>
 // __version__   = 1.0.0
@@ -32,61 +32,61 @@
 
 #include "downloader.h"
 
-CColonyDownloadItem::CColonyDownloadItem() {
+CSDownloadItem::CSDownloadItem() {
 }
 
-CColonyDownloadItem::CColonyDownloadItem(std::string &name, std::string &description, std::string &address) {
+CSDownloadItem::CSDownloadItem(std::string &name, std::string &description, std::string &address) {
     this->name = name;
     this->description = description;
     this->address = address;
 }
 
-CColonyDownloadItem::~CColonyDownloadItem() {
+CSDownloadItem::~CSDownloadItem() {
 }
 
-std::string &CColonyDownloadItem::getName() {
+std::string &CSDownloadItem::getName() {
     return this->name;
 }
 
-std::string &CColonyDownloadItem::getDescription() {
+std::string &CSDownloadItem::getDescription() {
     return this->description;
 }
 
-std::string &CColonyDownloadItem::getAddress() {
+std::string &CSDownloadItem::getAddress() {
     return this->address;
 }
 
-CColonyDownloader::CColonyDownloader() {
+CSDownloader::CSDownloader() {
     this->tempPath = "";
 };
 
-CColonyDownloader::~CColonyDownloader() {
+CSDownloader::~CSDownloader() {
 };
 
-void CColonyDownloader::downloadItem(CColonyDownloadItem &downloadItem) {
+void CSDownloader::downloadItem(CSDownloadItem &downloadItem) {
     // creates a new (jimbo) http client
     JBHttpClient httpClient = JBHttpClient();
 
-    // creates a new colony download observer object
-    CColonyDownloadObserver colonyDownloadObserver = CColonyDownloadObserver();
+    // creates a new download observer object
+    CSDownloadObserver downloadObserver = CSDownloadObserver();
 
-    // sets the window handler in the colony download observer
-    colonyDownloadObserver.setWindowHandler(*(this->handlerWindowReference));
+    // sets the window handler in the download observer
+    downloadObserver.setWindowHandler(*(this->handlerWindowReference));
 
-    // sets the progress handler in the colony download observer
-    colonyDownloadObserver.setProgressHandler(handlerProgress);
+    // sets the progress handler in the download observer
+    downloadObserver.setProgressHandler(handlerProgress);
 
-    // sets the download item in the colony download observer
-    colonyDownloadObserver.setDownloadItem(downloadItem);
+    // sets the download item in the download observer
+    downloadObserver.setDownloadItem(downloadItem);
 
     // registers the observer for the header loaded event
-    httpClient.registerObserverForEvent("header_loaded", colonyDownloadObserver);
+    httpClient.registerObserverForEvent("header_loaded", downloadObserver);
 
     // registers the observer for the download changed event
-    httpClient.registerObserverForEvent("download_changed", colonyDownloadObserver);
+    httpClient.registerObserverForEvent("download_changed", downloadObserver);
 
     // registers the observer for the download completed event
-    httpClient.registerObserverForEvent("download_completed", colonyDownloadObserver);
+    httpClient.registerObserverForEvent("download_completed", downloadObserver);
 
     // retrieves the remote contents
     httpClient.getContents(downloadItem.getAddress());
@@ -114,7 +114,7 @@ void CColonyDownloader::downloadItem(CColonyDownloadItem &downloadItem) {
     this->downloadItemsFilePathMap[downloadItem.getAddress()] = fileName;
 }
 
-void CColonyDownloader::unpackItem(CColonyDownloadItem &downloadItem, std::string &targetPath) {
+void CSDownloader::unpackItem(CSDownloadItem &downloadItem, std::string &targetPath) {
     // retrieves the download item file path
     std::string &downloadItemFilePath = this->getDownloadItemFilePath(downloadItem);
 
@@ -131,7 +131,7 @@ void CColonyDownloader::unpackItem(CColonyDownloadItem &downloadItem, std::strin
     this->temporaryFiles.push_back(tarFilePath);
 }
 
-void CColonyDownloader::generateTempPath() {
+void CSDownloader::generateTempPath() {
     // allocates space for the temp path
     char tempPath[1024];
 
@@ -141,14 +141,14 @@ void CColonyDownloader::generateTempPath() {
     this->tempPath = std::string(tempPath);
 }
 
-std::string &CColonyDownloader::getTempPath() {
+std::string &CSDownloader::getTempPath() {
     if(this->tempPath == "")
         this->generateTempPath();
 
     return this->tempPath;
 }
 
-void CColonyDownloader::createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow) {
+void CSDownloader::createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow) {
     // allocates space for the thread id
     DWORD threadId;
 
@@ -174,13 +174,13 @@ void CColonyDownloader::createDownloadWindow(HINSTANCE handlerInstance, int nCmd
     CloseHandle(windowEvent);
 }
 
-void CColonyDownloader::downloadFiles() {
-    BOOST_FOREACH(CColonyDownloadItem &downloadItem, this->downloadItems) {
+void CSDownloader::downloadFiles() {
+    BOOST_FOREACH(CSDownloadItem &downloadItem, this->downloadItems) {
         this->downloadItem(downloadItem);
     }
 }
 
-std::string CColonyDownloader::unpackFiles(std::string targetPath) {
+std::string CSDownloader::unpackFiles(std::string targetPath) {
     // sends the message to change the label of the window
     SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Uncompressing installation files", NULL);
 
@@ -214,7 +214,7 @@ std::string CColonyDownloader::unpackFiles(std::string targetPath) {
         this->temporaryFiles.push_back(std::string(fileName));
     }
 
-    BOOST_FOREACH(CColonyDownloadItem &downloadItem, this->downloadItems) {
+    BOOST_FOREACH(CSDownloadItem &downloadItem, this->downloadItems) {
         this->unpackItem(downloadItem, targetPath);
     }
 
@@ -226,7 +226,7 @@ std::string CColonyDownloader::unpackFiles(std::string targetPath) {
     return targetPath;
 }
 
-void CColonyDownloader::deleteTemporaryFiles() {
+void CSDownloader::deleteTemporaryFiles() {
     JBLogger::getLogger("setup")->info("Deleting temporary files ...");
 
     BOOST_FOREACH(std::string &temporaryDirectory, this->temporaryDirectories) {
@@ -238,26 +238,26 @@ void CColonyDownloader::deleteTemporaryFiles() {
     }
 }
 
-void CColonyDownloader::setBaseDownloadAddress(std::string &baseDownloadAddress){
+void CSDownloader::setBaseDownloadAddress(std::string &baseDownloadAddress){
     this->baseDownloadAddress = baseDownloadAddress;
 }
 
-void CColonyDownloader::addDownloadItem(CColonyDownloadItem &colonyDownloadItem) {
-    this->downloadItems.push_back(colonyDownloadItem);
+void CSDownloader::addDownloadItem(CSDownloadItem &downloadItem) {
+    this->downloadItems.push_back(downloadItem);
 }
 
-CColonyDownloadItem &CColonyDownloader::addDownloadFile(std::string &name, std::string &description) {
-    CColonyDownloadItem colonyDownloadItem = CColonyDownloadItem(name, description, this->baseDownloadAddress + "/" + name);
+CSDownloadItem &CSDownloader::addDownloadFile(std::string &name, std::string &description) {
+    CSDownloadItem downloadItem = CSDownloadItem(name, description, this->baseDownloadAddress + "/" + name);
 
-    this->downloadItems.push_back(colonyDownloadItem);
+    this->downloadItems.push_back(downloadItem);
 
     return this->downloadItems.back();
 }
 
-std::string &CColonyDownloader::getDownloadItemFilePath(CColonyDownloadItem &colonyDownloadItem) {
-    std::string &colonyDownloadItemAddress = colonyDownloadItem.getAddress();
+std::string &CSDownloader::getDownloadItemFilePath(CSDownloadItem &downloadItem) {
+    std::string &downloadItemAddress = downloadItem.getAddress();
 
-    std::string &filePath = this->downloadItemsFilePathMap[colonyDownloadItemAddress];
+    std::string &filePath = this->downloadItemsFilePathMap[downloadItemAddress];
 
     return filePath;
 }

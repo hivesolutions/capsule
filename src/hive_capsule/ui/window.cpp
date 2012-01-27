@@ -1,20 +1,20 @@
-// Hive Colony Framework
+// Hive Capsule Installer
 // Copyright (C) 2008 Hive Solutions Lda.
 //
-// This file is part of Hive Colony Framework.
+// This file is part of Hive Capsule Installer.
 //
-// Hive Colony Framework is free software: you can redistribute it and/or modify
+// Hive Capsule Installer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Hive Colony Framework is distributed in the hope that it will be useful,
+// Hive Capsule Installer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Hive Colony Framework. If not, see <http://www.gnu.org/licenses/>.
+// along with Hive Capsule Installer. If not, see <http://www.gnu.org/licenses/>.
 
 // __author__    = João Magalhães <joamag@hive.pt>
 // __version__   = 1.0.0
@@ -45,7 +45,7 @@ UINT changeLabelStringEventValue;
 UINT changeProgressEventValue;
 
 // sets the window label value
-std::string windowLabelValue = std::string("Transfering Colony Installer requisites...");
+std::string windowLabelValue = std::string("Transfering Installer dependencies ...");
 
 DWORD WINAPI windowThread(void *parameters) {
     // retrieves the thread arguments converting the parameters to a vector
@@ -76,7 +76,7 @@ DWORD WINAPI windowThread(void *parameters) {
     int windowY = (screenHeight / 2) - (DOWNLOAD_WINDOW_HEIGHT / 2);
 
     // creates a new window to represent the download progress
-    HWND handlerWindow = CreateWindow("defaultWindow", "Hive Colony Installer", WS_BORDER | WS_CAPTION | WS_SYSMENU, windowX,
+    HWND handlerWindow = CreateWindow("defaultWindow", "Capsule Installer", WS_BORDER | WS_CAPTION | WS_SYSMENU, windowX,
                                       windowY, DOWNLOAD_WINDOW_WIDTH, DOWNLOAD_WINDOW_HEIGHT, NULL, NULL, handlerInstance, NULL);
 
     // sets the handler window reference

@@ -43,7 +43,7 @@ typedef struct Data_t {
     struct DataFile_t dataFiles[DATA_FILE_COUNT];
 } Data;
 
-class CData {
+class CSData {
     public:
         static struct Data_t *getData();
         static struct Data_t *getData(char *filePath);

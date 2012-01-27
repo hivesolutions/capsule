@@ -45,8 +45,7 @@
  * The text string to be used to presetn and help
  * orientation to the final end user.
  */
-#define HELP_SUPPORT_MESSAGE "HELP:\n\n\
-capsule run\n\
+#define HELP_SUPPORT_MESSAGE "capsule run\n\
    Normal execution of the capsule installation system\n\n\
 capsule duplicate <target>\n\
 capsule clone <target>\n\

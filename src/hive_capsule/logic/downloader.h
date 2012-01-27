@@ -27,43 +27,43 @@
 
 #define TEMP_FILE_PREFIX "hve"
 
-class CColonyDownloadItem {
+class CSDownloadItem {
     private:
         std::string name;
         std::string description;
         std::string address;
     public:
-        CColonyDownloadItem();
-        CColonyDownloadItem(std::string &name, std::string &description, std::string &address);
-        ~CColonyDownloadItem();
+        CSDownloadItem();
+        CSDownloadItem(std::string &name, std::string &description, std::string &address);
+        ~CSDownloadItem();
         std::string &getName();
         std::string &getDescription();
         std::string &getAddress();
 };
 
-class CColonyDownloader {
+class CSDownloader {
     private:
         HWND *handlerWindowReference;
         std::string baseDownloadAddress;
-        std::vector<CColonyDownloadItem> downloadItems;
+        std::vector<CSDownloadItem> downloadItems;
         std::map<std::string, std::string> downloadItemsFilePathMap;
         std::vector<std::string> temporaryFiles;
         std::vector<std::string> temporaryDirectories;
         std::string tempPath;
 
-        void downloadItem(CColonyDownloadItem &downloadItem);
-        void unpackItem(CColonyDownloadItem &downloadItem, std::string &targetPath);
+        void downloadItem(CSDownloadItem &downloadItem);
+        void unpackItem(CSDownloadItem &downloadItem, std::string &targetPath);
         void generateTempPath();
         std::string &getTempPath();
     public:
-        CColonyDownloader();
-        ~CColonyDownloader();
+        CSDownloader();
+        ~CSDownloader();
         void createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow);
         void downloadFiles();
         std::string unpackFiles(std::string targetPath = "");
         void deleteTemporaryFiles();
         void setBaseDownloadAddress(std::string &baseDownloadAddress);
-        void addDownloadItem(CColonyDownloadItem &colonyDownloadItem);
-        CColonyDownloadItem &addDownloadFile(std::string &name, std::string &description);
-        std::string &getDownloadItemFilePath(CColonyDownloadItem &colonyDownloadItem);
+        void addDownloadItem(CSDownloadItem &downloadItem);
+        CSDownloadItem &addDownloadFile(std::string &name, std::string &description);
+        std::string &getDownloadItemFilePath(CSDownloadItem &downloadItem);
 };

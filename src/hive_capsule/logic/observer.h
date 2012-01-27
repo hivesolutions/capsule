@@ -27,18 +27,18 @@
 
 #include "downloader.h"
 
-class CColonyDownloadObserver : public JBObserver {
+class CSDownloadObserver : public JBObserver {
     private:
         HWND windowHandler;
         HWND progressHandler;
-        CColonyDownloadItem downloadItem;
+        CSDownloadItem downloadItem;
         int scale;
         int lastValue;
     public:
-        CColonyDownloadObserver();
-        ~CColonyDownloadObserver();
+        CSDownloadObserver();
+        ~CSDownloadObserver();
         void update(JBObservable &element, std::string &eventName, void *arguments);
         void setWindowHandler(HWND &windowHandler);
         void setProgressHandler(HWND &progressHandler);
-        void setDownloadItem(CColonyDownloadItem &downloadItem);
+        void setDownloadItem(CSDownloadItem &downloadItem);
 };

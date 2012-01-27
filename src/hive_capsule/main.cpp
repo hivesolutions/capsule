@@ -64,10 +64,10 @@ LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT *pNumArgs)
         return NULL;
 
     int storage = numArgs * sizeof(LPSTR);
-    for (int i = 0; i < numArgs; ++ i)
+    for (int index = 0; index < numArgs; ++index)
     {
         BOOL lpUsedDefaultChar = FALSE;
-        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
+        retval = WideCharToMultiByte(CP_ACP, 0, args[index], -1, NULL, 0, NULL, &lpUsedDefaultChar);
         if (!SUCCEEDED(retval))
         {
             LocalFree(args);
@@ -86,16 +86,16 @@ LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT *pNumArgs)
 
     int bufLen = storage - numArgs * sizeof(LPSTR);
     LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
-    for (int i = 0; i < numArgs; ++i) {
+    for (int index = 0; index < numArgs; ++index) {
         BOOL lpUsedDefaultChar = FALSE;
-        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
+        retval = WideCharToMultiByte(CP_ACP, 0, args[index], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
         if(!SUCCEEDED(retval)) {
             LocalFree(result);
             LocalFree(args);
             return NULL;
         }
 
-        result[i] = buffer;
+        result[index] = buffer;
         buffer += retval;
         bufLen -= retval;
     }
@@ -213,14 +213,14 @@ int duplicate(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 int append(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     char *filePath;
     struct DataFile_t dataFile;
-    char i = 0;
+    char index = 0;
 
-    if(argc > 5) { filePath = argv[2]; i++; }
+    if(argc > 5) { filePath = argv[2]; index++; }
     else { filePath = DEFAULT_SETUP_NAME; }
 
-    char *name = argv[2 + i];
-    char *description = argv[3 + i];
-    char *url = argv[4 + i];
+    char *name = argv[2 + index];
+    char *description = argv[3 + index];
+    char *url = argv[4 + index];
 
     size_t nameSize = strlen(name);
     size_t descriptionSize = strlen(description);

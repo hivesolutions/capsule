@@ -159,6 +159,8 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 
             struct Data_t *data = CData::getData();
 
+			JBLogger::getLogger("setup")->debug("Inserting %d data files into the downloader ...", data->numberFiles);
+
             for(size_t index = 0; index < data->numberFiles; index++) {
                 struct DataFile_t *dataFile = &data->dataFiles[index];
                 CColonyDownloadItem downloadItem = CColonyDownloadItem(std::string(dataFile->name), std::string(dataFile->description), std::string(dataFile->url));

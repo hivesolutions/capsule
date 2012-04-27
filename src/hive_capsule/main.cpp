@@ -44,6 +44,49 @@ int help(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     return 0;
 }
 
+
+HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR workingDirectory, LPCSTR lpszDesc) 
+{ 
+    HRESULT hres; 
+    IShellLink* psl; 
+ 
+    // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
+    // has already been called.
+    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl); 
+    if (SUCCEEDED(hres)) 
+    { 
+        IPersistFile* ppf; 
+ 
+        // Set the path to the shortcut target and add the description. 
+        psl->SetPath(lpszPathObj); 
+        psl->SetDescription(lpszDesc);
+		psl->SetWorkingDirectory(workingDirectory);
+ 
+        // Query IShellLink for the IPersistFile interface, used for saving the 
+        // shortcut in persistent storage. 
+        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf); 
+ 
+        if (SUCCEEDED(hres)) {
+            WCHAR wsz[MAX_PATH]; 
+
+            // Ensure that the string is Unicode. 
+            MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
+            
+            // Add code here to check return value from MultiByteWideChar 
+            // for success.
+ 
+            // Save the link by calling IPersistFile::Save. 
+            hres = ppf->Save(wsz, TRUE); 
+            ppf->Release(); 
+        } 
+        psl->Release(); 
+    } 
+    return hres; 
+}
+
+
+
+
 int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     // shows a message box asking for confirmation
     int returnValue = MessageBox(
@@ -95,10 +138,38 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 			// print a debug message into the logger
 			JBLogger::getLogger("setup")->debug("Unpacked files into %s", targetPath.c_str());
 
+
+
+
+
+			// THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
+			char programsPath[MAX_PATH];
+			ExpandEnvironmentStrings("%PROGRAMFILES%", programsPath, MAX_PATH);
+			sprintf_s(programsPath, "%s\\%s", programsPath, dataFile->name);
+
+
+
+
+
 			// deploys the files into the destination directory and then
 			// deletes the temporary files for the current data file
-			downloader.deployFiles("C:\\destination");
+			downloader.deployFiles(programsPath);
 			downloader.deleteTemporaryFiles();
+
+			// THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
+			
+			char path[MAX_PATH];
+
+			char filePath[MAX_PATH];
+
+			sprintf_s(filePath, "%s\\viriatum.exe", programsPath);
+
+			ExpandEnvironmentStrings("%USERPROFILE%", path, MAX_PATH);
+			sprintf_s(path, "%s\\Desktop\\Viriatum.lnk", path);
+
+
+			CoInitialize(NULL);
+			CreateLink(filePath, path, programsPath, dataFile->name);
         }
 
         // releases the data structure (avoids memory leaking)

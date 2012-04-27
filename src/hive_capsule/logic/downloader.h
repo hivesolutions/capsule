@@ -61,6 +61,7 @@ class CSDownloader {
         void createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow);
         void downloadFiles();
         std::string unpackFiles(std::string targetPath = "");
+		std::string deployFiles(std::string deployPath);
         void deleteTemporaryFiles();
         void setBaseDownloadAddress(std::string &baseDownloadAddress);
         void addDownloadItem(CSDownloadItem &downloadItem);

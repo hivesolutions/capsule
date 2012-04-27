@@ -69,17 +69,17 @@ void CSData::setData(struct Data_t *data) {
 void CSData::setData(char *filePath, struct Data_t *data) {
     size_t dataSize = sizeof(Data_t);
 
-    HANDLE tobias = BeginUpdateResource(filePath, false);
-    BOOL success = UpdateResource(tobias, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, dataSize);
+    HANDLE resource = BeginUpdateResource(filePath, false);
+    BOOL success = UpdateResource(resource, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, dataSize);
     if(success == TRUE) {
-        EndUpdateResource(tobias, FALSE);
+        EndUpdateResource(resource, FALSE);
     }
 }
 
 void CSData::appendDataFile(struct DataFile_t *dataFile) {
-    char szFileName[MAX_PATH];
-    GetModuleFileName(NULL, szFileName, MAX_PATH);
-    CSData::appendDataFile(szFileName, dataFile);
+    char fileName[MAX_PATH];
+    GetModuleFileName(NULL, fileName, MAX_PATH);
+    CSData::appendDataFile(fileName, dataFile);
 }
 
 void CSData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {

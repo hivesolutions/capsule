@@ -85,22 +85,26 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             struct DataFile_t *dataFile = &data->dataFiles[index];
             CSDownloadItem downloadItem = CSDownloadItem(std::string(dataFile->name), std::string(dataFile->description), std::string(dataFile->url));
             downloader.addDownloadItem(downloadItem);
+
+			// downloads the various files from their respective remote storage locations
+			// in case the connection fails an exception is thrown, then unpacks their
+			// file into the appropriate locations
+			downloader.downloadFiles();
+			std::string &targetPath = downloader.unpackFiles();
+
+			// print a debug message into the logger
+			JBLogger::getLogger("setup")->debug("Unpacked files into %s", targetPath.c_str());
+
+			// deploys the files into the destination directory and then
+			// deletes the temporary files for the current data file
+			downloader.deployFiles("C:\\destination");
+			downloader.deleteTemporaryFiles();
         }
 
         // releases the data structure (avoids memory leaking)
         // this is required because the data structure is in
         // control by us
         free(data);
-
-        // downloads the various files from their respective remote storage locations
-        // in case the connection fails an exception is thrown
-        downloader.downloadFiles();
-
-        // unpacks the files and retrieves the target path
-        std::string &targetPath = downloader.unpackFiles();
-
-        // deletes the temporary files
-        downloader.deleteTemporaryFiles();
     }
 
     return 0;
@@ -111,8 +115,10 @@ int duplicate(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     // capsule installer file to be created (cloned)
     char *targetPath;
 
-    char szFileName[MAX_PATH];
-    GetModuleFileName(NULL, szFileName, MAX_PATH);
+	// allocates space for the file name of the current
+	// executable file name then retrieves it (module name)
+    char fileName[MAX_PATH];
+    GetModuleFileName(NULL, fileName, MAX_PATH);
 
     // checks if the target path is specified in case
     // it's not the default naming is used instead
@@ -124,7 +130,7 @@ int duplicate(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 
     // executes the copy operation duplicating the current
     // executing file into a duplicate (replica)
-    CopyFile(szFileName, targetPath, FALSE);
+    CopyFile(fileName, targetPath, FALSE);
 
     return 0;
 }
@@ -137,18 +143,26 @@ int append(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     if(argc > 5) { filePath = argv[2]; index++; }
     else { filePath = DEFAULT_SETUP_NAME; }
 
+	// retrieves the various arguments from the command line
+	// representing the various components of the data file
     char *name = argv[2 + index];
     char *description = argv[3 + index];
     char *url = argv[4 + index];
 
+	// retrieves the appropriate sizes from the string values
+	// for memory copy of their values
     size_t nameSize = strlen(name);
     size_t descriptionSize = strlen(description);
     size_t urlSize = strlen(url);
 
+	// copies the various data file attributes into the data file
+	// structure (populates the structure)
     memcpy(dataFile.name, name, nameSize + 1);
     memcpy(dataFile.description, description, descriptionSize + 1);
     memcpy(dataFile.url, url, urlSize + 1);
 
+	// adds the current data file to the current executable file
+	// persists the value (should raise an exception on error)
     CSData::appendDataFile(filePath, &dataFile);
 
     return 0;

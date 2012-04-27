@@ -182,13 +182,11 @@ void CSDownloader::downloadFiles() {
 }
 
 std::string CSDownloader::unpackFiles(std::string targetPath) {
-    // sends the message to change the label of the window
+    // sends the message to change the label of the window,
+	// then invalidates the window rectangle and after that
+	// sends a message to change the progress bar to marquee
     SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Uncompressing installation files", NULL);
-
-    // invalidates the window rectangle
     InvalidateRect(*this->handlerWindowReference, NULL, true);
-
-    // sends the message to change the progress bar to marquee
     SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
 
     if(targetPath == "") {
@@ -199,38 +197,72 @@ std::string CSDownloader::unpackFiles(std::string targetPath) {
         const char *tempPathChar = this->getTempPath().c_str();
 
         // tries to retrieve a temporary file name
-        if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName))
+		if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName)) {
             throw "Unable to create temporary file name";
+		}
 
+		// uses the temporary name to create a directory with it
+		// appends a suffix to it for the purpose
         std::string &directoryName = std::string(fileName) + std::string("dir");
 
         // creates the temporary directory
-        if(!CreateDirectory(directoryName.c_str(), NULL))
+		if(!CreateDirectory(directoryName.c_str(), NULL)) {
             throw "Unable to create directory";
+		}
 
-        // converts the the char array to string
+        // sets the current directory as the target path for
+		// the unpacking of the files
         targetPath = directoryName;
 
         // adds the temporary file name to the list of temporary files
         this->temporaryFiles.push_back(std::string(fileName));
     }
 
+	// iterates over all the downloaded items to unpack them
+	// into the target path (directory)
     for(size_t index = 0; index < this->downloadItems.size(); index++) {
+		// retrieves the current iteration download item
+		// and then unpacks it into the target path
         CSDownloadItem &downloadItem = this->downloadItems[index];
         this->unpackItem(downloadItem, targetPath);
     }
 
+	// adds the target path to the list of tempoary directories
+	// (keeps track of them for latter removal)
     this->temporaryDirectories.push_back(targetPath);
-
-    // closes (destroy) the window in the most correct procedure
-    // this call is done to prevent pending handles
-    DestroyWindow(*this->handlerWindowReference);
 
     return targetPath;
 }
 
+std::string CSDownloader::deployFiles(std::string deployPath) {
+	// prints an info message into the logger
+	JBLogger::getLogger("setup")->info("Deploying files ...");
+
+    // sends the message to change the label of the window,
+	// then invalidates the window rectangle and after that
+	// sends a message to change the progress bar to marquee
+    SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Deploying files to destination", NULL);
+    InvalidateRect(*this->handlerWindowReference, NULL, true);
+    SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
+
+    for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
+        std::string &temporaryDirectory = this->temporaryDirectories[index];
+        JBWindows::copyRecursiveShell(deployPath, temporaryDirectory);
+    }
+
+    return deployPath;
+}
+
 void CSDownloader::deleteTemporaryFiles() {
+    // prints an info message into the logger
     JBLogger::getLogger("setup")->info("Deleting temporary files ...");
+
+    // sends the message to change the label of the window,
+	// then invalidates the window rectangle and after that
+	// sends a message to change the progress bar to marquee
+    SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Deleting temporary files", NULL);
+    InvalidateRect(*this->handlerWindowReference, NULL, true);
+    SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
 
     for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
         std::string &temporaryDirectory = this->temporaryDirectories[index];
@@ -242,7 +274,12 @@ void CSDownloader::deleteTemporaryFiles() {
         DeleteFile(temporaryFile.c_str());
     }
 
+	// prints an info message into the logger
     JBLogger::getLogger("setup")->info("Finished deleting temporary files");
+
+    // closes (destroy) the window in the most correct procedure
+    // this call is done to prevent pending handles
+    DestroyWindow(*this->handlerWindowReference);
 }
 
 void CSDownloader::setBaseDownloadAddress(std::string &baseDownloadAddress){

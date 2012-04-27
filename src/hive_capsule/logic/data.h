@@ -32,7 +32,13 @@
  */
 #define DATA_FILE_COUNT 8
 
+typedef enum DataFileMode_e {
+	SIMPLE = 1,
+	TEMPORARY
+} DataFileMode;
+
 typedef struct DataFile_t {
+	static const enum DataFileMode_e type = SIMPLE;
     char name[256];
     char description[256];
     char url[2048];

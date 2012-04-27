@@ -62,7 +62,7 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 
     try {
         // tries to retrieve the python install path
-        std::string value = JBPython::getInstallPath(std::string("2.7asdad"));
+        std::string value = JBPython::getInstallPath(std::string("2.7ISOT E MAU"));
     } catch(char *) {
         // creates a new downloader instance and creates the
         // download window (with the installation controls
@@ -168,8 +168,11 @@ int pop(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 int dump(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     char *filePath;
 
-    if(argc > 2) { filePath = argv[3]; }
+    if(argc > 2) { filePath = argv[2]; }
     else { filePath = DEFAULT_DUMP_NAME; }
+
+    // prints an info message into the logger
+    JBLogger::getLogger("setup")->info("Dumping data into '%s'", filePath);
 
     std::ofstream dumpFile;
     dumpFile.open(filePath);

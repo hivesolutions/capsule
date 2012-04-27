@@ -61,6 +61,6 @@ capsule append <target> name description url\n\
 capsule pop\n\
     Removes the last data information file present in the capsule file\n\n\
 capsule dump <file>\n\
-    Removes the last data information file present in the capsule file"
+    Dumps the current data information into a target data file"
 
 int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);

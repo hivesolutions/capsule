@@ -283,7 +283,6 @@ int registerClass(HINSTANCE handlerInstance) {
     windowClassEx.cbWndExtra = 0;
     windowClassEx.hInstance = handlerInstance;
     windowClassEx.hIcon = NULL;
-    windowClassEx.hIconSm = LoadIcon(windowClassEx.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     windowClassEx.hCursor = LoadCursor(NULL, IDC_ARROW);
     windowClassEx.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
     windowClassEx.lpszMenuName = NULL;

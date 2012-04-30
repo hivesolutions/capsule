@@ -35,6 +35,7 @@ typedef enum Operations_e {
     RUN,
     DUPLICATE,
     APPEND,
+    EXTEND,
     POP,
     DUMP
 } Operations;
@@ -45,44 +46,47 @@ int help(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
 }
 
 
-HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR workingDirectory, LPCSTR lpszDesc) 
-{ 
-    HRESULT hres; 
-    IShellLink* psl; 
- 
+
+
+HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR workingDirectory, LPCSTR lpszDesc)
+{
+    HRESULT hres;
+    IShellLink* psl;
+
     // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
     // has already been called.
-    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl); 
-    if (SUCCEEDED(hres)) 
-    { 
-        IPersistFile* ppf; 
- 
-        // Set the path to the shortcut target and add the description. 
-        psl->SetPath(lpszPathObj); 
-        psl->SetDescription(lpszDesc);
-		psl->SetWorkingDirectory(workingDirectory);
- 
-        // Query IShellLink for the IPersistFile interface, used for saving the 
-        // shortcut in persistent storage. 
-        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf); 
- 
-        if (SUCCEEDED(hres)) {
-            WCHAR wsz[MAX_PATH]; 
+    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
+    if(SUCCEEDED(hres))
+    {
+        IPersistFile* ppf;
 
-            // Ensure that the string is Unicode. 
-            MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
-            
-            // Add code here to check return value from MultiByteWideChar 
+        // Set the path to the shortcut target and add the description.
+        psl->SetPath(lpszPathObj);
+        psl->SetDescription(lpszDesc);
+        psl->SetWorkingDirectory(workingDirectory);
+
+        // Query IShellLink for the IPersistFile interface, used for saving the
+        // shortcut in persistent storage.
+        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+
+        if(SUCCEEDED(hres)) {
+            WCHAR wsz[MAX_PATH];
+
+            // Ensure that the string is Unicode.
+            MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH);
+
+            // Add code here to check return value from MultiByteWideChar
             // for success.
- 
-            // Save the link by calling IPersistFile::Save. 
-            hres = ppf->Save(wsz, TRUE); 
-            ppf->Release(); 
-        } 
-        psl->Release(); 
-    } 
-    return hres; 
+
+            // Save the link by calling IPersistFile::Save.
+            hres = ppf->Save(wsz, TRUE);
+            ppf->Release();
+        }
+        psl->Release();
+    }
+    return hres;
 }
+
 
 
 
@@ -112,6 +116,10 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
         CSDownloader downloader = CSDownloader();
         downloader.createDownloadWindow(handlerInstance, nCmdShow);
 
+        // allocates space for the generic download item to be populated
+        // across the various files
+        CSDownloadItem downloadItem;
+
         // retrieves the current data structure from the current
         // execution process file (from the internal resources)
         struct Data_t *data = CSData::getData();
@@ -126,50 +134,49 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             // components of it, creates the download item with them as adds
             // the download item to the downloader object
             struct DataFile_t *dataFile = &data->dataFiles[index];
-            CSDownloadItem downloadItem = CSDownloadItem(std::string(dataFile->name), std::string(dataFile->description), std::string(dataFile->url));
+            if(dataFile->type == REMOTE) { downloadItem = CSDownloadItem(std::string(dataFile->name), std::string(dataFile->description), std::string(dataFile->url)); }
+            else { downloadItem = CSDownloadItem(std::string(dataFile->name), std::string(dataFile->description), dataFile->buffer, dataFile->bufferSize); }
             downloader.addDownloadItem(downloadItem);
 
-			// downloads the various files from their respective remote storage locations
-			// in case the connection fails an exception is thrown, then unpacks their
-			// file into the appropriate locations
-			downloader.downloadFiles();
-			std::string &targetPath = downloader.unpackFiles();
+            // downloads the various files from their respective remote storage locations
+            // in case the connection fails an exception is thrown, then unpacks their
+            // file into the appropriate locations
+            downloader.downloadFiles();
+            std::string &targetPath = downloader.unpackFiles();
 
-			// print a debug message into the logger
-			JBLogger::getLogger("setup")->debug("Unpacked files into %s", targetPath.c_str());
-
-
+            // print a debug message into the logger
+            JBLogger::getLogger("setup")->debug("Unpacked files into %s", targetPath.c_str());
 
 
 
-			// THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
-			char programsPath[MAX_PATH];
-			ExpandEnvironmentStrings("%PROGRAMFILES%", programsPath, MAX_PATH);
-			sprintf_s(programsPath, "%s\\%s", programsPath, dataFile->name);
+            // THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
+            char programsPath[MAX_PATH];
+            ExpandEnvironmentStrings("%PROGRAMFILES%", programsPath, MAX_PATH);
+            sprintf_s(programsPath, "%s\\%s", programsPath, dataFile->name);
 
 
 
 
 
-			// deploys the files into the destination directory and then
-			// deletes the temporary files for the current data file
-			downloader.deployFiles(programsPath);
-			downloader.deleteTemporaryFiles();
+            // deploys the files into the destination directory and then
+            // deletes the temporary files for the current data file
+            downloader.deployFiles(programsPath);
+            downloader.deleteTemporaryFiles();
 
-			// THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
-			
-			char path[MAX_PATH];
+            // THIS IS COMPLETLY HARDCODED !!!! (SOFTCODE IT)
 
-			char filePath[MAX_PATH];
+            char path[MAX_PATH];
 
-			sprintf_s(filePath, "%s\\viriatum.exe", programsPath);
+            char filePath[MAX_PATH];
 
-			ExpandEnvironmentStrings("%USERPROFILE%", path, MAX_PATH);
-			sprintf_s(path, "%s\\Desktop\\Viriatum.lnk", path);
+            sprintf_s(filePath, "%s\\viriatum.exe", programsPath);
+
+            ExpandEnvironmentStrings("%USERPROFILE%", path, MAX_PATH);
+            sprintf_s(path, "%s\\Desktop\\Viriatum.lnk", path);
 
 
-			CoInitialize(NULL);
-			CreateLink(filePath, path, programsPath, dataFile->name);
+            CoInitialize(NULL);
+            CreateLink(filePath, path, programsPath, dataFile->name);
         }
 
         // releases the data structure (avoids memory leaking)
@@ -186,8 +193,8 @@ int duplicate(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     // capsule installer file to be created (cloned)
     char *targetPath;
 
-	// allocates space for the file name of the current
-	// executable file name then retrieves it (module name)
+    // allocates space for the file name of the current
+    // executable file name then retrieves it (module name)
     char fileName[MAX_PATH];
     GetModuleFileName(NULL, fileName, MAX_PATH);
 
@@ -214,27 +221,105 @@ int append(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
     if(argc > 5) { filePath = argv[2]; index++; }
     else { filePath = DEFAULT_SETUP_NAME; }
 
-	// retrieves the various arguments from the command line
-	// representing the various components of the data file
+    // retrieves the various arguments from the command line
+    // representing the various components of the data file
     char *name = argv[2 + index];
     char *description = argv[3 + index];
     char *url = argv[4 + index];
 
-	// retrieves the appropriate sizes from the string values
-	// for memory copy of their values
+    // retrieves the appropriate sizes from the string values
+    // for memory copy of their values
     size_t nameSize = strlen(name);
     size_t descriptionSize = strlen(description);
     size_t urlSize = strlen(url);
 
-	// copies the various data file attributes into the data file
-	// structure (populates the structure)
+    // copies the various data file attributes into the data file
+    // structure (populates the structure)
     memcpy(dataFile.name, name, nameSize + 1);
     memcpy(dataFile.description, description, descriptionSize + 1);
     memcpy(dataFile.url, url, urlSize + 1);
 
-	// adds the current data file to the current executable file
-	// persists the value (should raise an exception on error)
+    // sets the buffer related attributes to their default values
+    // (this will unset the buffer behavior in this data file)
+    dataFile.buffer = NULL;
+    dataFile.bufferSize = 0;
+    dataFile.bufferOffset = 0;
+
+    // sets the data file type as remote (data file must
+    // be retrieved using http)
+    dataFile.type = REMOTE;
+
+    // adds the current data file to the current executable file
+    // persists the value (should raise an exception on error)
     CSData::appendDataFile(filePath, &dataFile);
+
+    return 0;
+}
+
+int extend(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
+    char *filePath;
+    struct DataFile_t dataFile;
+    char index = 0;
+
+    if(argc > 5) { filePath = argv[2]; index++; }
+    else { filePath = DEFAULT_SETUP_NAME; }
+
+    // retrieves the various arguments from the command line
+    // representing the various components of the data file
+    char *name = argv[2 + index];
+    char *description = argv[3 + index];
+    char *dataPath = argv[4 + index];
+
+    // retrieves the appropriate sizes from the string values
+    // for memory copy of their values
+    size_t nameSize = strlen(name);
+    size_t descriptionSize = strlen(description);
+
+    // opens the data file from the retrieved data path
+    FILE *file;
+    fopen_s(&file, dataPath, "rb");
+
+    // prints an info message into the logger
+    JBLogger::getLogger("setup")->info("Reading data file '%s'", dataPath);
+
+    // retrieves the size of teh data file
+    // this is going to be used to set the
+    // buffer size
+    fseek(file, 0, SEEK_END);
+    size_t bufferSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // allocates space for the file buffer and then
+    // reads the file into it (complete file read)
+    char *buffer = (char *) malloc(bufferSize);
+    fread(buffer, sizeof(char), bufferSize, file);
+
+    // closes the buffer file (no leaking)
+    fclose(file);
+
+    // copies the various data file attributes into the data file
+    // structure (populates the structure)
+    memcpy(dataFile.name, name, nameSize + 1);
+    memcpy(dataFile.description, description, descriptionSize + 1);
+
+    // updates the url value to an empty string and then sets the
+    // proper buffer values, the offset is not set yet
+    dataFile.url[0] = '\0';
+    dataFile.buffer = buffer;
+    dataFile.bufferSize = bufferSize;
+    dataFile.bufferOffset = 0;
+
+    // sets the data file type as remote (data file is
+    // stored in the file resources)
+    dataFile.type = LOCAL;
+
+    // adds the current data file to the current executable file
+    // persists the value (should raise an exception on error)
+    CSData::appendDataFile(filePath, &dataFile);
+
+    // releases the buffer (no more need to use it)
+    // avoids memory leaks
+    free(buffer);
 
     return 0;
 }
@@ -283,6 +368,10 @@ int call(enum Operations_e operation, char **argv, int argc, HINSTANCE handlerIn
 
         case APPEND:
             return append(argv, argc, handlerInstance, nCmdShow);
+            break;
+
+        case EXTEND:
+            return extend(argv, argc, handlerInstance, nCmdShow);
             break;
 
         case POP:
@@ -340,6 +429,7 @@ int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTST
             else if(!strcmp(argv[1], "duplicate")) { operation = DUPLICATE; }
             else if(!strcmp(argv[1], "clone")) { operation = DUPLICATE; }
             else if(!strcmp(argv[1], "append")) { operation = APPEND; }
+            else if(!strcmp(argv[1], "extend")) { operation = EXTEND; }
             else if(!strcmp(argv[1], "pop")) { operation = POP; }
             else if(!strcmp(argv[1], "dump")) { operation = DUMP; }
             else { throw "Invalid command line option"; }

@@ -58,6 +58,8 @@ capsule clone <target>\n\
     Duplicates the current file creating an exact copy\n\n\
 capsule append <target> name description url\n\
     Adds a data information file to the capsule file, may be used for runtime\n\n\
+capsule extend <target> name description data\n\
+    Adds a data information file to the capsule file, the data information is added to the file itself\n\n\
 capsule pop\n\
     Removes the last data information file present in the capsule file\n\n\
 capsule dump <file>\n\

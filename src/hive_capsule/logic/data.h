@@ -33,19 +33,23 @@
 #define DATA_FILE_COUNT 8
 
 typedef enum DataFileMode_e {
-	SIMPLE = 1,
-	TEMPORARY
+    REMOTE = 1,
+    LOCAL
 } DataFileMode;
 
 typedef struct DataFile_t {
-	static const enum DataFileMode_e type = SIMPLE;
+    enum DataFileMode_e type;
     char name[256];
     char description[256];
     char url[2048];
+    char *buffer;
+    unsigned int bufferSize;
+    unsigned int bufferOffset;
 } DataFile;
 
 typedef struct Data_t {
     size_t numberFiles;
+    size_t bufferSize;
     struct DataFile_t dataFiles[DATA_FILE_COUNT];
 } Data;
 
@@ -55,6 +59,8 @@ class CSData {
         static struct Data_t *getData(char *filePath);
         static void setData(struct Data_t *data);
         static void setData(char *filePath, struct Data_t *data);
+        static void setBuffer(struct Data_t *data);
+        static void setBuffer(char *filePath, struct Data_t *data);
         static void appendDataFile(struct DataFile_t *dataFile);
         static void appendDataFile(char *filePath, struct DataFile_t *dataFile);
         static void popDataFile();

@@ -32,13 +32,18 @@ class CSDownloadItem {
         std::string name;
         std::string description;
         std::string address;
+        char *buffer;
+        size_t bufferSize;
     public:
         CSDownloadItem();
         CSDownloadItem(std::string &name, std::string &description, std::string &address);
+        CSDownloadItem(std::string &name, std::string &description, char *buffer, size_t bufferSize);
         ~CSDownloadItem();
         std::string &getName();
         std::string &getDescription();
         std::string &getAddress();
+        char *getBuffer();
+        size_t getBufferSize();
 };
 
 class CSDownloader {
@@ -51,6 +56,7 @@ class CSDownloader {
         std::vector<std::string> temporaryDirectories;
         std::string tempPath;
 
+        void loadItem(CSDownloadItem &downloadItem);
         void downloadItem(CSDownloadItem &downloadItem);
         void unpackItem(CSDownloadItem &downloadItem, std::string &targetPath);
         void generateTempPath();
@@ -61,7 +67,7 @@ class CSDownloader {
         void createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow);
         void downloadFiles();
         std::string unpackFiles(std::string targetPath = "");
-		std::string deployFiles(std::string deployPath);
+        std::string deployFiles(std::string deployPath);
         void deleteTemporaryFiles();
         void setBaseDownloadAddress(std::string &baseDownloadAddress);
         void addDownloadItem(CSDownloadItem &downloadItem);

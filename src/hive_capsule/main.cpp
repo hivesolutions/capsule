@@ -124,7 +124,7 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
         // execution process file (from the internal resources)
         struct Data_t *data = CSData::getData();
 
-        // print a debug message into the logger
+        // print as debug message into the logger
         JBLogger::getLogger("setup")->debug("Inserting %d data files into the downloader ...", data->numberFiles);
 
         // iterates over all the data files to register them for
@@ -144,7 +144,7 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             downloader.downloadFiles();
             std::string &targetPath = downloader.unpackFiles();
 
-            // print a debug message into the logger
+            // prints adebug message into the logger
             JBLogger::getLogger("setup")->debug("Unpacked files into '%s'", targetPath.c_str());
 
 
@@ -155,7 +155,7 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             sprintf_s(programsPath, "%s\\%s", programsPath, dataFile->name);
 
 
-            // print a debug message into the logger
+            // prints adebug message into the logger
             JBLogger::getLogger("setup")->debug("Deploying files into '%s' ...", programsPath);
 
 

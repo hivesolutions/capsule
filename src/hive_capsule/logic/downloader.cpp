@@ -283,11 +283,19 @@ std::string CSDownloader::deployFiles(std::string deployPath) {
     InvalidateRect(*this->handlerWindowReference, NULL, true);
     SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
 
+    // creates the directory for the deployment (this will ensure
+    // that the directory exists)
+    CreateDirectory(deployPath.c_str(), NULL);
+
+    // iterates over all the temporary directories to copy them into
+    // the "final" deploy target path
     for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
         std::string &temporaryDirectory = this->temporaryDirectories[index];
         JBWindows::copyRecursiveShell(deployPath, temporaryDirectory);
     }
 
+    // returns the deploy path that was used in the deployment
+    // phase (this should be used by the caller for confirmation)
     return deployPath;
 }
 

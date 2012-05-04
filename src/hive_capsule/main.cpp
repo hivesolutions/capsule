@@ -145,7 +145,7 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             std::string &targetPath = downloader.unpackFiles();
 
             // print a debug message into the logger
-            JBLogger::getLogger("setup")->debug("Unpacked files into %s", targetPath.c_str());
+            JBLogger::getLogger("setup")->debug("Unpacked files into '%s'", targetPath.c_str());
 
 
 
@@ -155,6 +155,8 @@ int run(char **argv, int argc, HINSTANCE handlerInstance, int nCmdShow) {
             sprintf_s(programsPath, "%s\\%s", programsPath, dataFile->name);
 
 
+            // print a debug message into the logger
+            JBLogger::getLogger("setup")->debug("Deploying files into '%s' ...", programsPath);
 
 
 

@@ -32,41 +32,41 @@
  */
 #define DATA_FILE_COUNT 8
 
-typedef enum DataFileMode_e {
+enum DataFileModeType {
     REMOTE = 1,
     LOCAL
-} DataFileMode;
+};
 
-typedef struct DataFile_t {
-    enum DataFileMode_e type;
+struct DataFileType {
+    enum DataFileModeType type;
     char name[256];
     char description[256];
     char url[2048];
     char *buffer;
-    unsigned int bufferSize;
-    unsigned int bufferOffset;
-} DataFile;
+    unsigned int buffer_size;
+    unsigned int buffer_offset;
+};
 
-typedef struct Data_t {
-    size_t numberFiles;
-    size_t bufferSize;
-    struct DataFile_t dataFiles[DATA_FILE_COUNT];
-} Data;
+struct DataType {
+    size_t number_files;
+    size_t buffer_size;
+    struct DataFileType data_files[DATA_FILE_COUNT];
+};
 
 class CSData {
     public:
-        static struct Data_t *getData();
-        static struct Data_t *getData(char *filePath);
-        static void setData(struct Data_t *data);
-        static void setData(char *filePath, struct Data_t *data);
-        static void setBuffer(struct Data_t *data);
-        static void setBuffer(char *filePath, struct Data_t *data);
-        static void appendDataFile(struct DataFile_t *dataFile);
-        static void appendDataFile(char *filePath, struct DataFile_t *dataFile);
-        static void popDataFile();
-        static void popDataFile(char *filePath);
-        static void printDataFile(char *filePath, size_t index);
-        static void printDataFile(char *filePath, size_t index, std::ostream &stream);
-        static void printData(std::ostream &stream);
-        static void printData(char *filePath, std::ostream &stream);
+        static struct DataType *GetData();
+        static struct DataType *GetData(char *file_path);
+        static void SetData(struct DataType *data);
+        static void SetData(char *file_path, struct DataType *data);
+        static void SetBuffer(struct DataType *data);
+        static void SetBuffer(char *file_path, struct DataType *data);
+        static void AppendDataFile(struct DataFileType *data_file);
+        static void AppendDataFile(char *file_path, struct DataFileType *data_file);
+        static void PopDataFile();
+        static void PopDataFile(char *file_path);
+        static void PrintDataFile(char *file_path, size_t index);
+        static void PrintDataFile(char *file_path, size_t index, std::ostream &stream);
+        static void PrintData(std::ostream &stream);
+        static void PrintData(char *file_path, std::ostream &stream);
 };

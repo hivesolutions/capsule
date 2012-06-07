@@ -28,15 +28,15 @@
 #include "util.h"
 
 #ifdef CS_DEBUG
-void CSUtil::sartLogger() {
-    JBLogger *logger = JBLogger::getLogger("setup");
-    JBLoggerFileHandler *fileHandler = new JBLoggerFileHandler(std::string("setup.log"));
-    logger->addHandler(fileHandler);
-    logger->setLevel(DEBUG);
-    logger->info("Log system started");
+void CSUtil::SartLogger() {
+    JBLogger *logger = JBLogger::GetLogger("setup");
+    JBLoggerFileHandler *file_handler = new JBLoggerFileHandler(std::string("setup.log"));
+    logger->AddHandler(file_handler);
+    logger->SetLevel(DEBUG);
+    logger->Info("Log system started");
 }
 
-void CSUtil::startConsole() {
+void CSUtil::StartConsole() {
     // allocates the console interface in the windows
     // sub system and attaches it to the curren process
     AllocConsole();
@@ -54,11 +54,11 @@ void CSUtil::startConsole() {
     freopen_s(&_stderr, "CONOUT$", "wb", stderr);
 }
 
-void CSUtil::stopConsole() {
+void CSUtil::StopConsole() {
     FreeConsole();
 }
 #else
-void CSUtil::sartLogger() { }
-void CSUtil::startConsole() { }
-void CSUtil::stopConsole() { }
+void CSUtil::SartLogger() { }
+void CSUtil::StartConsole() { }
+void CSUtil::StopConsole() { }
 #endif

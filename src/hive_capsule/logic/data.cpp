@@ -27,50 +27,50 @@
 
 #include "data.h"
 
-struct Data_t *CSData::getData() {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    return CSData::getData(fileName);
+struct DataType *CSData::GetData() {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    return CSData::GetData(file_name);
 }
 
-struct Data_t *CSData::getData(char *filePath) {
-    struct Data_t *data;
+struct DataType *CSData::GetData(char *file_path) {
+    struct DataType *data;
 
-    HMODULE library = LoadLibrary(filePath);
+    HMODULE library = LoadLibrary(file_path);
     if(library == NULL) {
         throw "Invalid data path";
     }
 
-    HRSRC resourcePath = FindResource(library, "DATA", RT_RCDATA);
+    HRSRC resource_path = FindResource(library, "DATA", RT_RCDATA);
 
-    size_t dataSize = sizeof(struct Data_t);
-    data = (struct Data_t *) malloc(dataSize);
+    size_t data_size = sizeof(struct DataType);
+    data = (struct DataType *) malloc(data_size);
 
-    if(resourcePath == NULL) {
-        memset(data, 0, dataSize);
-        data->numberFiles = 0;
+    if(resource_path == NULL) {
+        memset(data, 0, data_size);
+        data->number_files = 0;
     } else {
-        HGLOBAL resource = LoadResource(library, resourcePath);
-        struct Data_t *_data = (struct Data_t *) LockResource(resource);
-        memcpy(data, _data, dataSize);
+        HGLOBAL resource = LoadResource(library, resource_path);
+        struct DataType *_data = (struct DataType *) LockResource(resource);
+        memcpy(data, _data, data_size);
     }
 
-    resourcePath = FindResource(library, "BUFFER", RT_RCDATA);
+    resource_path = FindResource(library, "BUFFER", RT_RCDATA);
 
-    size_t bufferSize = data->bufferSize;
-    char *buffer = (char *) malloc(data->bufferSize);
+    size_t buffer_size = data->buffer_size;
+    char *buffer = (char *) malloc(data->buffer_size);
 
-    if(resourcePath == NULL) {
-        memset(buffer, 0, bufferSize);
+    if(resource_path == NULL) {
+        memset(buffer, 0, buffer_size);
     } else {
-        HGLOBAL resource = LoadResource(library, resourcePath);
+        HGLOBAL resource = LoadResource(library, resource_path);
         char *_buffer = (char *) LockResource(resource);
-        memcpy(buffer, _buffer, bufferSize);
+        memcpy(buffer, _buffer, buffer_size);
     }
 
-    for(size_t index = 0; index < data->numberFiles; index++) {
-        struct DataFile_t *dataFile = &data->dataFiles[index];
-        dataFile->buffer = buffer + dataFile->bufferOffset;
+    for(size_t index = 0; index < data->number_files; index++) {
+        struct DataFileType *data_file = &data->data_files[index];
+        data_file->buffer = buffer + data_file->buffer_offset;
     }
 
     FreeLibrary(library);
@@ -78,64 +78,64 @@ struct Data_t *CSData::getData(char *filePath) {
     return data;
 }
 
-void CSData::setData(struct Data_t *data) {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    CSData::setData(fileName, data);
+void CSData::SetData(struct DataType *data) {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    CSData::SetData(file_name, data);
 }
 
-void CSData::setData(char *filePath, struct Data_t *data) {
-    size_t dataSize = sizeof(Data_t);
+void CSData::SetData(char *file_path, struct DataType *data) {
+    size_t data_size = sizeof(struct DataType);
 
-    HANDLE resource = BeginUpdateResource(filePath, false);
-    BOOL successData = UpdateResource(resource, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, dataSize);
+    HANDLE resource = BeginUpdateResource(file_path, false);
+    BOOL success_data = UpdateResource(resource, RT_RCDATA, "DATA", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), data, data_size);
 
-    if(successData == TRUE) {
+    if(success_data == TRUE) {
         EndUpdateResource(resource, FALSE);
     }
 }
 
-void CSData::setBuffer(struct Data_t *data) {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    CSData::setBuffer(fileName, data);
+void CSData::SetBuffer(struct DataType *data) {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    CSData::SetBuffer(file_name, data);
 }
 
-void CSData::setBuffer(char *filePath, struct Data_t *data) {
-    size_t bufferSize = 0;
+void CSData::SetBuffer(char *file_path, struct DataType *data) {
+    size_t buffer_size = 0;
 
-    for(size_t index = 0; index < data->numberFiles; index++) {
-        struct DataFile_t *dataFile = &data->dataFiles[index];
+    for(size_t index = 0; index < data->number_files; index++) {
+        struct DataFileType *data_file = &data->data_files[index];
 
-        bufferSize += dataFile->bufferSize;
+        buffer_size += data_file->buffer_size;
     }
 
-    data->bufferSize = bufferSize;
+    data->buffer_size = buffer_size;
 
-    // prints a debug message into the logger
-    JBLogger::getLogger("setup")->debug("Allocating buffer of size %d bytes ...", bufferSize);
+    // prints a Debug message into the logger
+    JBLogger::GetLogger("setup")->Debug("Allocating buffer of size %d bytes ...", buffer_size);
 
-    char *buffer = (char *) malloc(bufferSize);
-    char *bufferOriginal = buffer;
+    char *buffer = (char *) malloc(buffer_size);
+    char *buffer_original = buffer;
 
     size_t offset = 0;
 
-    for(size_t index = 0; index < data->numberFiles; index++) {
-        struct DataFile_t *dataFile = &data->dataFiles[index];
-        memcpy(buffer, dataFile->buffer, dataFile->bufferSize);
-        dataFile->bufferOffset = offset;
+    for(size_t index = 0; index < data->number_files; index++) {
+        struct DataFileType *data_file = &data->data_files[index];
+        memcpy(buffer, data_file->buffer, data_file->buffer_size);
+        data_file->buffer_offset = offset;
 
-        buffer += dataFile->bufferSize;
-        offset += dataFile->bufferSize;
+        buffer += data_file->buffer_size;
+        offset += data_file->buffer_size;
     }
 
-    buffer = bufferOriginal;
+    buffer = buffer_original;
 
-    // prints a debug message into the logger
-    JBLogger::getLogger("setup")->debug("Saving buffer resource into file");
+    // prints a Debug message into the logger
+    JBLogger::GetLogger("setup")->Debug("Saving buffer resource into file");
 
-    HANDLE resource = BeginUpdateResource(filePath, false);
-    BOOL success = UpdateResource(resource, RT_RCDATA, "BUFFER", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buffer, bufferSize);
+    HANDLE resource = BeginUpdateResource(file_path, false);
+    BOOL success = UpdateResource(resource, RT_RCDATA, "BUFFER", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buffer, buffer_size);
 
     if(success == TRUE) {
         EndUpdateResource(resource, FALSE);
@@ -144,87 +144,87 @@ void CSData::setBuffer(char *filePath, struct Data_t *data) {
     free(buffer);
 }
 
-void CSData::appendDataFile(struct DataFile_t *dataFile) {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    CSData::appendDataFile(fileName, dataFile);
+void CSData::AppendDataFile(struct DataFileType *data_file) {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    CSData::AppendDataFile(file_name, data_file);
 }
 
-void CSData::appendDataFile(char *filePath, struct DataFile_t *dataFile) {
-    struct Data_t *data = CSData::getData(filePath);
+void CSData::AppendDataFile(char *file_path, struct DataFileType *data_file) {
+    struct DataType *data = CSData::GetData(file_path);
 
-    if(data->numberFiles == DATA_FILE_COUNT) {
+    if(data->number_files == DATA_FILE_COUNT) {
         throw "No more space available in the data file";
     }
 
-    memcpy(&data->dataFiles[data->numberFiles], dataFile, sizeof(struct DataFile_t));
-    data->numberFiles++;
+    memcpy(&data->data_files[data->number_files], data_file, sizeof(struct DataFileType));
+    data->number_files++;
 
-    CSData::setBuffer(filePath, data);
-    CSData::setData(filePath, data);
+    CSData::SetBuffer(file_path, data);
+    CSData::SetData(file_path, data);
 
     free(data);
 }
 
-void CSData::popDataFile() {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    CSData::popDataFile(fileName);
+void CSData::PopDataFile() {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    CSData::PopDataFile(file_name);
 }
 
-void CSData::popDataFile(char *filePath) {
-    struct Data_t *data = CSData::getData(filePath);
+void CSData::PopDataFile(char *file_path) {
+    struct DataType *data = CSData::GetData(file_path);
 
-    if(data->numberFiles == 0) {
+    if(data->number_files == 0) {
         throw "No more data files available to pop";
     }
 
-    memset(&data->dataFiles[data->numberFiles - 1], 0, sizeof(struct DataFile_t));
-    data->numberFiles--;
+    memset(&data->data_files[data->number_files - 1], 0, sizeof(struct DataFileType));
+    data->number_files--;
 
-    CSData::setBuffer(filePath, data);
-    CSData::setData(filePath, data);
+    CSData::SetBuffer(file_path, data);
+    CSData::SetData(file_path, data);
 
     free(data);
 }
 
-void CSData::printDataFile(char *filePath, size_t index) {
-    CSData::printDataFile(filePath, index, std::cout);
+void CSData::PrintDataFile(char *file_path, size_t index) {
+    CSData::PrintDataFile(file_path, index, std::cout);
 }
 
-void CSData::printDataFile(char *filePath, size_t index, std::ostream &stream) {
-    struct Data_t *data = CSData::getData(filePath);
+void CSData::PrintDataFile(char *file_path, size_t index, std::ostream &stream) {
+    struct DataType *data = CSData::GetData(file_path);
 
-    if(index > data->numberFiles - 1) {
+    if(index > data->number_files - 1) {
         throw "Data file index not found in data";
     }
 
-    struct DataFile_t *dataFile = &data->dataFiles[index];
+    struct DataFileType *data_file = &data->data_files[index];
 
-    stream << "Type => '" << dataFile->type << "'\n";
-    stream << "Name => '" << dataFile->name << "'\n";
-    stream << "Description => '" << dataFile->description << "'\n";
-    stream << "URL => '" << dataFile->url << "'\n";
-    stream << "Size => '" << dataFile->bufferSize << "'\n";
-    stream << "Offset => '" << dataFile->bufferOffset << "'\n";
+    stream << "Type => '" << data_file->type << "'\n";
+    stream << "Name => '" << data_file->name << "'\n";
+    stream << "Description => '" << data_file->description << "'\n";
+    stream << "URL => '" << data_file->url << "'\n";
+    stream << "Size => '" << data_file->buffer_size << "'\n";
+    stream << "Offset => '" << data_file->buffer_offset << "'\n";
 
     free(data);
 }
 
-void CSData::printData(std::ostream &stream) {
-    char fileName[MAX_PATH];
-    GetModuleFileName(NULL, fileName, MAX_PATH);
-    CSData::printData(fileName, stream);
+void CSData::PrintData(std::ostream &stream) {
+    char file_name[MAX_PATH];
+    GetModuleFileName(NULL, file_name, MAX_PATH);
+    CSData::PrintData(file_name, stream);
 }
 
-void CSData::printData(char *filePath, std::ostream &stream) {
-    struct Data_t *data = CSData::getData(filePath);
+void CSData::PrintData(char *file_path, std::ostream &stream) {
+    struct DataType *data = CSData::GetData(file_path);
 
-    bool isFirst = true;
+    bool is_first = true;
 
-    for(size_t index = 0; index < data->numberFiles; index++) {
-        if(isFirst) { isFirst = false; } else { stream << "\n"; }
-        CSData::printDataFile(filePath, index, stream);
+    for(size_t index = 0; index < data->number_files; index++) {
+        if(is_first) { is_first = false; } else { stream << "\n"; }
+        CSData::PrintDataFile(file_path, index, stream);
     }
 
     free(data);

@@ -27,7 +27,7 @@
 
 class CSUtil {
     public:
-        static void sartLogger();
-        static void startConsole();
-        static void stopConsole();
+        static void SartLogger();
+        static void StartConsole();
+        static void StopConsole();
 };

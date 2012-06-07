@@ -29,16 +29,16 @@
 
 class CSDownloadObserver : public JBObserver {
     private:
-        HWND windowHandler;
-        HWND progressHandler;
-        CSDownloadItem downloadItem;
+        HWND window_handler;
+        HWND progress_handler;
+        CSDownloadItem download_item;
         int scale;
-        int lastValue;
+        int last_value;
     public:
         CSDownloadObserver();
         ~CSDownloadObserver();
-        void update(JBObservable &element, std::string &eventName, void *arguments);
-        void setWindowHandler(HWND &windowHandler);
-        void setProgressHandler(HWND &progressHandler);
-        void setDownloadItem(CSDownloadItem &downloadItem);
+        void Update(JBObservable &element, std::string &event_name, void *arguments);
+        void SetWindowHandler(HWND &window_handler);
+        void SetProgressHandler(HWND &progress_handler);
+        void SetDownloadItem(CSDownloadItem &download_item);
 };

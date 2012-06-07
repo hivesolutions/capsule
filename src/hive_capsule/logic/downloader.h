@@ -33,44 +33,44 @@ class CSDownloadItem {
         std::string description;
         std::string address;
         char *buffer;
-        size_t bufferSize;
+        size_t buffer_size;
     public:
         CSDownloadItem();
         CSDownloadItem(std::string &name, std::string &description, std::string &address);
-        CSDownloadItem(std::string &name, std::string &description, char *buffer, size_t bufferSize);
+        CSDownloadItem(std::string &name, std::string &description, char *buffer, size_t buffer_size);
         ~CSDownloadItem();
-        std::string &getName();
-        std::string &getDescription();
-        std::string &getAddress();
-        char *getBuffer();
-        size_t getBufferSize();
+        std::string &GetName();
+        std::string &GetDescription();
+        std::string &GetAddress();
+        char *GetBuffer();
+        size_t GetBufferSize();
 };
 
 class CSDownloader {
     private:
-        HWND *handlerWindowReference;
-        std::string baseDownloadAddress;
-        std::vector<CSDownloadItem> downloadItems;
-        std::map<std::string, std::string> downloadItemsFilePathMap;
-        std::vector<std::string> temporaryFiles;
-        std::vector<std::string> temporaryDirectories;
-        std::string tempPath;
+        HWND *handler_window_reference;
+        std::string base_download_address;
+        std::vector<CSDownloadItem> download_items;
+        std::map<std::string, std::string> download_items_file_path_map;
+        std::vector<std::string> temporary_files;
+        std::vector<std::string> temporary_directories;
+        std::string temp_path;
 
-        void loadItem(CSDownloadItem &downloadItem);
-        void downloadItem(CSDownloadItem &downloadItem);
-        void unpackItem(CSDownloadItem &downloadItem, std::string &targetPath);
-        void generateTempPath();
-        std::string &getTempPath();
+        void LoadItem(CSDownloadItem &download_item);
+        void DownloadItem(CSDownloadItem &download_item);
+        void UnpackItem(CSDownloadItem &download_item, std::string &target_path);
+        void GenerateTempPath();
+        std::string &_GetTempPath();
     public:
         CSDownloader();
         ~CSDownloader();
-        void createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow);
-        void downloadFiles();
-        std::string unpackFiles(std::string targetPath = "");
-        std::string deployFiles(std::string deployPath);
-        void deleteTemporaryFiles();
-        void setBaseDownloadAddress(std::string &baseDownloadAddress);
-        void addDownloadItem(CSDownloadItem &downloadItem);
-        CSDownloadItem &addDownloadFile(std::string &name, std::string &description);
-        std::string &getDownloadItemFilePath(CSDownloadItem &downloadItem);
+        void CreateDownloadWindow(HINSTANCE handler_instance, int cmd_show);
+        void DownloadFiles();
+        std::string UnpackFiles(std::string target_path = "");
+        std::string DeployFiles(std::string deploy_path);
+        void DeleteTemporaryFiles();
+        void SetBaseDownloadAddress(std::string &base_download_address);
+        void AddDownloadItem(CSDownloadItem &download_item);
+        CSDownloadItem &AddDownloadFile(std::string &name, std::string &description);
+        std::string &GetDownloadItemFilePath(CSDownloadItem &download_item);
 };

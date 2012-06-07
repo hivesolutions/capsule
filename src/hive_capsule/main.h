@@ -65,4 +65,4 @@ capsule pop\n\
 capsule dump <file>\n\
     Dumps the current data information into a target data file"
 
-int APIENTRY _tWinMain(HINSTANCE handlerInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow);
+int APIENTRY _tWinMain(HINSTANCE handler_instance, HINSTANCE prev_instance, LPTSTR cmd_line, int cmd_show);

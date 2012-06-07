@@ -35,13 +35,13 @@
  */
 #define DOWNLOAD_WINDOW_HEIGHT 140
 
-extern HINSTANCE hInst;
-extern HWND handlerProgress;
-extern UINT changeLabelEventValue;
-extern UINT changeLabelStringEventValue;
-extern UINT changeProgressEventValue;
+extern HINSTANCE instance;
+extern HWND handler_progress;
+extern UINT change_label_event_value;
+extern UINT change_label_string_event_value;
+extern UINT change_progress_event_value;
 
-DWORD WINAPI windowThread(LPVOID parameters);
-LRESULT CALLBACK WndProc(HWND handlerWindow, UINT message, WPARAM wParam, LPARAM lParam);
-int registerClass(HINSTANCE handlerInstance);
-int cancelProcess();
+DWORD WINAPI WindowThread(LPVOID parameters);
+LRESULT CALLBACK WndProc(HWND handler_window, UINT message, WPARAM w_param, LPARAM l_param);
+int RegisterClass(HINSTANCE handler_instance);
+int CancelProcess();

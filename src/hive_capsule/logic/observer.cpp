@@ -29,28 +29,28 @@
 #include "observer.h"
 
 CSDownloadObserver::CSDownloadObserver() : JBObserver() {
-    this->lastValue = 0;
+    this->last_value = 0;
 };
 
 CSDownloadObserver::~CSDownloadObserver() {
 };
 
-void CSDownloadObserver::setWindowHandler(HWND &windowHandler) {
-    this->windowHandler = windowHandler;
+void CSDownloadObserver::SetWindowHandler(HWND &window_handler) {
+    this->window_handler = window_handler;
 };
 
-void CSDownloadObserver::setProgressHandler(HWND &progressHandler) {
-    this->progressHandler = progressHandler;
+void CSDownloadObserver::SetProgressHandler(HWND &progress_handler) {
+    this->progress_handler = progress_handler;
 };
 
-void CSDownloadObserver::setDownloadItem(CSDownloadItem &downloadItem) {
-    this->downloadItem = downloadItem;
+void CSDownloadObserver::SetDownloadItem(CSDownloadItem &download_item) {
+    this->download_item = download_item;
 };
 
-void CSDownloadObserver::update(JBObservable &element, std::string &eventName, void *arguments) {
-    JBObserver::update(element, eventName, arguments);
+void CSDownloadObserver::Update(JBObservable &element, std::string &event_name, void *arguments) {
+    JBObserver::Update(element, event_name, arguments);
 
-    if(eventName == "header_loaded") {
+    if(event_name == "header_loaded") {
         // retrieves the value from the arguments
         int value = *(int *) arguments;
 
@@ -58,35 +58,35 @@ void CSDownloadObserver::update(JBObservable &element, std::string &eventName, v
         this->scale = value;
 
         // creates the message to be used in the transfer
-        std::string *message = new std::string("Transfering " + this->downloadItem.getDescription());
+        std::string *message = new std::string("Transfering " + this->download_item.GetDescription());
 
         // sends the message to change the label string of the window
         // and also sets the progress handler to the original (start position)
-        SendMessage(this->windowHandler, changeLabelStringEventValue, (WPARAM) message, NULL);
-        SendMessage(this->progressHandler, PBM_SETPOS, 0, NULL);
+        SendMessage(this->window_handler, change_label_string_event_value, (WPARAM) message, NULL);
+        SendMessage(this->progress_handler, PBM_SETPOS, 0, NULL);
 
         // invalidates the window rectangle
-        InvalidateRect(this->windowHandler, NULL, true);
+        InvalidateRect(this->window_handler, NULL, true);
     }
-    else if(eventName == "download_changed") {
+    else if(event_name == "download_changed") {
         // retrieves the value from the arguments
         int value = *(int *) arguments;
 
         // in case the delta value is less than 100 KB
-        if(value - this->lastValue < 102400)
+        if(value - this->last_value < 102400)
             return;
 
         // sets the last value
-        this->lastValue = value;
+        this->last_value = value;
 
         // calculates the final value
-        int finalValue = (int) (((float) value / (float) this->scale) * 100);
+        int final_value = (int) (((float) value / (float) this->scale) * 100);
 
         // sends a message to set the position in the progress handler
-        SendMessage(this->progressHandler, PBM_SETPOS, finalValue, NULL);
+        SendMessage(this->progress_handler, PBM_SETPOS, final_value, NULL);
     }
-    else if(eventName == "download_completed") {
+    else if(event_name == "download_completed") {
         // sets the progress bar at the end
-        SendMessage(this->progressHandler, PBM_SETPOS, 100, NULL);
+        SendMessage(this->progress_handler, PBM_SETPOS, 100, NULL);
     }
 };

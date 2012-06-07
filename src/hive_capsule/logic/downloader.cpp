@@ -40,314 +40,314 @@ CSDownloadItem::CSDownloadItem(std::string &name, std::string &description, std:
     this->description = description;
     this->address = address;
     this->buffer = NULL;
-    this->bufferSize = 0;
+    this->buffer_size = 0;
 }
 
-CSDownloadItem::CSDownloadItem(std::string &name, std::string &description, char *buffer, size_t bufferSize) {
+CSDownloadItem::CSDownloadItem(std::string &name, std::string &description, char *buffer, size_t buffer_size) {
     this->name = name;
     this->description = description;
     this->address = name;
     this->buffer = buffer;
-    this->bufferSize = bufferSize;
+    this->buffer_size = buffer_size;
 }
 
 CSDownloadItem::~CSDownloadItem() {
 }
 
-std::string &CSDownloadItem::getName() {
+std::string &CSDownloadItem::GetName() {
     return this->name;
 }
 
-std::string &CSDownloadItem::getDescription() {
+std::string &CSDownloadItem::GetDescription() {
     return this->description;
 }
 
-std::string &CSDownloadItem::getAddress() {
+std::string &CSDownloadItem::GetAddress() {
     return this->address;
 }
 
-char *CSDownloadItem::getBuffer() {
+char *CSDownloadItem::GetBuffer() {
     return this->buffer;
 }
 
-size_t CSDownloadItem::getBufferSize() {
-    return this->bufferSize;
+size_t CSDownloadItem::GetBufferSize() {
+    return this->buffer_size;
 }
 
 CSDownloader::CSDownloader() {
-    this->tempPath = "";
+    this->temp_path = "";
 }
 
 CSDownloader::~CSDownloader() {
 }
 
-void CSDownloader::loadItem(CSDownloadItem &downloadItem) {
+void CSDownloader::LoadItem(CSDownloadItem &download_item) {
     // allocates space for the file name
-    char fileName[MAX_PATH];
+    char file_name[MAX_PATH];
 
     // retrieves the temp path in char
-    const char *tempPathChar = this->getTempPath().c_str();
+    const char *temp_path_char = this->_GetTempPath().c_str();
 
     // tries to retrieve a temporary file name
-    if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName)) {
+    if(!GetTempFileName(temp_path_char, TEMP_FILE_PREFIX, NULL, file_name)) {
         throw "Unable to create temporary file name";
     }
 
     // opens the file for read and write, writes the contents to the file
     // and closes it (avoid leaking)
-    std::fstream file = std::fstream(fileName, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
-    file.write(downloadItem.getBuffer(), downloadItem.getBufferSize());
+    std::fstream file = std::fstream(file_name, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
+    file.write(download_item.GetBuffer(), download_item.GetBufferSize());
     file.close();
 
     // sets the download item file path association in the map
-    this->downloadItemsFilePathMap[downloadItem.getAddress()] = fileName;
+    this->download_items_file_path_map[download_item.GetAddress()] = file_name;
 }
 
-void CSDownloader::downloadItem(CSDownloadItem &downloadItem) {
+void CSDownloader::DownloadItem(CSDownloadItem &download_item) {
     // creates a new (jimbo) http client
-    JBHttpClient httpClient = JBHttpClient();
+    JBHttpClient http_client = JBHttpClient();
 
     // creates a new download observer object
-    CSDownloadObserver downloadObserver = CSDownloadObserver();
+    CSDownloadObserver download_observer = CSDownloadObserver();
 
     // sets the window handler in the download observer
-    downloadObserver.setWindowHandler(*(this->handlerWindowReference));
+    download_observer.SetWindowHandler(*(this->handler_window_reference));
 
     // sets the progress handler in the download observer
-    downloadObserver.setProgressHandler(handlerProgress);
+    download_observer.SetProgressHandler(handler_progress);
 
     // sets the download item in the download observer
-    downloadObserver.setDownloadItem(downloadItem);
+    download_observer.SetDownloadItem(download_item);
 
     // registers the observer for the header loaded, download
     // changed and download completed events
-    httpClient.registerObserverForEvent("header_loaded", downloadObserver);
-    httpClient.registerObserverForEvent("download_changed", downloadObserver);
-    httpClient.registerObserverForEvent("download_completed", downloadObserver);
+    http_client.RegisterObserverForEvent("header_loaded", download_observer);
+    http_client.RegisterObserverForEvent("download_changed", download_observer);
+    http_client.RegisterObserverForEvent("download_completed", download_observer);
 
     // retrieves the remote contents
-    httpClient.getContents(downloadItem.getAddress());
+    http_client.GetContents(download_item.GetAddress());
 
     // allocates space for the file name
-    char fileName[MAX_PATH];
+    char file_name[MAX_PATH];
 
     // retrieves the temp path in char
-    const char *tempPathChar = this->getTempPath().c_str();
+    const char *temp_path_char = this->_GetTempPath().c_str();
 
     // tries to retrieve a temporary file name
-    if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName)) {
+    if(!GetTempFileName(temp_path_char, TEMP_FILE_PREFIX, NULL, file_name)) {
         throw "Unable to create temporary file name";
     }
 
     // opens the file for read and write, writes the contents to the file
     // and closes it (avoid leaking)
-    std::fstream file = std::fstream(fileName, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
-    file.write(httpClient.getMessageBuffer(), httpClient.getMessageSize());
+    std::fstream file = std::fstream(file_name, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
+    file.write(http_client.GetMessageBuffer(), http_client.GetMessageSize());
     file.close();
 
     // sets the download item file path association in the map
-    this->downloadItemsFilePathMap[downloadItem.getAddress()] = fileName;
+    this->download_items_file_path_map[download_item.GetAddress()] = file_name;
 }
 
-void CSDownloader::unpackItem(CSDownloadItem &downloadItem, std::string &targetPath) {
+void CSDownloader::UnpackItem(CSDownloadItem &download_item, std::string &target_path) {
     // retrieves the download item file path
-    std::string &downloadItemFilePath = this->getDownloadItemFilePath(downloadItem);
+    std::string &download_item_file_path = this->GetDownloadItemFilePath(download_item);
 
     // constructs the tar file path from the download item file path
-    std::string tarFilePath = downloadItemFilePath + ".tar";
+    std::string tar_file_path = download_item_file_path + ".tar";
 
     // unpacks the gz file to the tar file
-    JBPackerGz::unpackFile(downloadItemFilePath, tarFilePath);
+    JBPackerGz::UnpackFile(download_item_file_path, tar_file_path);
 
     // unpacks the tar file to the temp path
-    JBPackerTar::unpackFile(tarFilePath, targetPath + "/");
+    JBPackerTar::UnpackFile(tar_file_path, target_path + "/");
 
-    this->temporaryFiles.push_back(downloadItemFilePath);
-    this->temporaryFiles.push_back(tarFilePath);
+    this->temporary_files.push_back(download_item_file_path);
+    this->temporary_files.push_back(tar_file_path);
 }
 
-void CSDownloader::generateTempPath() {
+void CSDownloader::GenerateTempPath() {
     // allocates space for the temp path then retrieves
     // the local temp path (by copy) and converts it into
     // string setting it in the current object
-    char tempPath[1024];
-    GetTempPath(1024, tempPath);
-    this->tempPath = std::string(tempPath);
+    char temp_path[1024];
+    GetTempPath(1024, temp_path);
+    this->temp_path = std::string(temp_path);
 }
 
-std::string &CSDownloader::getTempPath() {
+std::string &CSDownloader::_GetTempPath() {
     // in case no temp path is currently set in the object
     // a new one must be generated (on demand generation)
-    if(this->tempPath == "") { this->generateTempPath(); }
+    if(this->temp_path == "") { this->GenerateTempPath(); }
 
     // retrieves the current associated temp path, must be
     // unique in the system
-    return this->tempPath;
+    return this->temp_path;
 }
 
-void CSDownloader::createDownloadWindow(HINSTANCE handlerInstance, int nCmdShow) {
+void CSDownloader::CreateDownloadWindow(HINSTANCE handler_instance, int cmd_show) {
     // allocates space for the thread id
-    DWORD threadId;
+    DWORD thread_id;
 
     // creates the window event to controll the window creation
-    HANDLE windowEvent = CreateEvent(NULL, false, false, NULL);
+    HANDLE window_event = CreateEvent(NULL, false, false, NULL);
 
     // allocates space for the thread arguments
-    std::vector<void *> threadArguments;
+    std::vector<void *> thread_arguments;
 
     // adds the arguments to the thread arguments list
-    threadArguments.push_back(handlerInstance);
-    threadArguments.push_back(&nCmdShow);
-    threadArguments.push_back(&this->handlerWindowReference);
-    threadArguments.push_back(windowEvent);
+    thread_arguments.push_back(handler_instance);
+    thread_arguments.push_back(&cmd_show);
+    thread_arguments.push_back(&this->handler_window_reference);
+    thread_arguments.push_back(window_event);
 
     // creates the thread and retrieves the thread handle
-    HANDLE threadHandle = CreateThread(NULL, 0, windowThread, (void *) &threadArguments, 0, &threadId);
+    HANDLE thread_handle = CreateThread(NULL, 0, WindowThread, (void *) &thread_arguments, 0, &thread_id);
 
     // waits for the window event to be released
-    WaitForSingleObject(windowEvent, INFINITE);
+    WaitForSingleObject(window_event, INFINITE);
 
     // closes the window event handle
-    CloseHandle(windowEvent);
+    CloseHandle(window_event);
 }
 
-void CSDownloader::downloadFiles() {
-    for(size_t index = 0; index < this->downloadItems.size(); index++) {
-        CSDownloadItem &downloadItem = this->downloadItems[index];
-        if(downloadItem.getBuffer() == NULL) { this->downloadItem(downloadItem); }
-        else { this->loadItem(downloadItem); }
+void CSDownloader::DownloadFiles() {
+    for(size_t index = 0; index < this->download_items.size(); index++) {
+        CSDownloadItem &download_item = this->download_items[index];
+        if(download_item.GetBuffer() == NULL) { this->DownloadItem(download_item); }
+        else { this->LoadItem(download_item); }
     }
 }
 
-std::string CSDownloader::unpackFiles(std::string targetPath) {
+std::string CSDownloader::UnpackFiles(std::string target_path) {
     // sends the message to change the label of the window,
     // then invalidates the window rectangle and after that
     // sends a message to change the progress bar to marquee
-    SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Uncompressing installation files", NULL);
-    InvalidateRect(*this->handlerWindowReference, NULL, true);
-    SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
+    SendMessage(*this->handler_window_reference, change_label_event_value, (WPARAM) "Uncompressing installation files", NULL);
+    InvalidateRect(*this->handler_window_reference, NULL, true);
+    SendMessage(*this->handler_window_reference, change_progress_event_value, 2, NULL);
 
-    if(targetPath == "") {
+    if(target_path == "") {
         // allocates space for the file name
-        char fileName[MAX_PATH];
+        char file_name[MAX_PATH];
 
         // retrieves the temp path in char
-        const char *tempPathChar = this->getTempPath().c_str();
+        const char *temp_path_char = this->_GetTempPath().c_str();
 
         // tries to retrieve a temporary file name
-        if(!GetTempFileName(tempPathChar, TEMP_FILE_PREFIX, NULL, fileName)) {
+        if(!GetTempFileName(temp_path_char, TEMP_FILE_PREFIX, NULL, file_name)) {
             throw "Unable to create temporary file name";
         }
 
         // uses the temporary name to create a directory with it
         // appends a suffix to it for the purpose
-        std::string &directoryName = std::string(fileName) + std::string("dir");
+        std::string &directory_name = std::string(file_name) + std::string("dir");
 
         // creates the temporary directory
-        if(!CreateDirectory(directoryName.c_str(), NULL)) {
+        if(!CreateDirectory(directory_name.c_str(), NULL)) {
             throw "Unable to create directory";
         }
 
         // sets the current directory as the target path for
         // the unpacking of the files
-        targetPath = directoryName;
+        target_path = directory_name;
 
         // adds the temporary file name to the list of temporary files
-        this->temporaryFiles.push_back(std::string(fileName));
+        this->temporary_files.push_back(std::string(file_name));
     }
 
     // iterates over all the downloaded items to unpack them
     // into the target path (directory)
-    for(size_t index = 0; index < this->downloadItems.size(); index++) {
+    for(size_t index = 0; index < this->download_items.size(); index++) {
         // retrieves the current iteration download item
         // and then unpacks it into the target path
-        CSDownloadItem &downloadItem = this->downloadItems[index];
-        this->unpackItem(downloadItem, targetPath);
+        CSDownloadItem &download_item = this->download_items[index];
+        this->UnpackItem(download_item, target_path);
     }
 
     // adds the target path to the list of tempoary directories
     // (keeps track of them for latter removal)
-    this->temporaryDirectories.push_back(targetPath);
+    this->temporary_directories.push_back(target_path);
 
-    return targetPath;
+    return target_path;
 }
 
-std::string CSDownloader::deployFiles(std::string deployPath) {
-    // prints an info message into the logger
-    JBLogger::getLogger("setup")->info("Deploying files ...");
+std::string CSDownloader::DeployFiles(std::string deploy_path) {
+    // prints an Info message into the logger
+    JBLogger::GetLogger("setup")->Info("Deploying files ...");
 
     // sends the message to change the label of the window,
     // then invalidates the window rectangle and after that
     // sends a message to change the progress bar to marquee
-    SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Deploying files to destination", NULL);
-    InvalidateRect(*this->handlerWindowReference, NULL, true);
-    SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
+    SendMessage(*this->handler_window_reference, change_label_event_value, (WPARAM) "Deploying files to destination", NULL);
+    InvalidateRect(*this->handler_window_reference, NULL, true);
+    SendMessage(*this->handler_window_reference, change_progress_event_value, 2, NULL);
 
     // creates the directory for the deployment (this will ensure
     // that the directory exists)
-    CreateDirectory(deployPath.c_str(), NULL);
+    CreateDirectory(deploy_path.c_str(), NULL);
 
     // iterates over all the temporary directories to copy them into
     // the "final" deploy target path
-    for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
-        std::string &temporaryDirectory = this->temporaryDirectories[index];
-        JBWindows::copyRecursiveShell(deployPath, temporaryDirectory);
+    for(size_t index = 0; index < this->temporary_directories.size(); index++) {
+        std::string &temporary_directory = this->temporary_directories[index];
+        JBWindows::CopyRecursiveShell(deploy_path, temporary_directory);
     }
 
     // returns the deploy path that was used in the deployment
     // phase (this should be used by the caller for confirmation)
-    return deployPath;
+    return deploy_path;
 }
 
-void CSDownloader::deleteTemporaryFiles() {
-    // prints an info message into the logger
-    JBLogger::getLogger("setup")->info("Deleting temporary files ...");
+void CSDownloader::DeleteTemporaryFiles() {
+    // prints an Info message into the logger
+    JBLogger::GetLogger("setup")->Info("Deleting temporary files ...");
 
     // sends the message to change the label of the window,
     // then invalidates the window rectangle and after that
     // sends a message to change the progress bar to marquee
-    SendMessage(*this->handlerWindowReference, changeLabelEventValue, (WPARAM) "Deleting temporary files", NULL);
-    InvalidateRect(*this->handlerWindowReference, NULL, true);
-    SendMessage(*this->handlerWindowReference, changeProgressEventValue, 2, NULL);
+    SendMessage(*this->handler_window_reference, change_label_event_value, (WPARAM) "Deleting temporary files", NULL);
+    InvalidateRect(*this->handler_window_reference, NULL, true);
+    SendMessage(*this->handler_window_reference, change_progress_event_value, 2, NULL);
 
-    for(size_t index = 0; index < this->temporaryDirectories.size(); index++) {
-        std::string &temporaryDirectory = this->temporaryDirectories[index];
-        JBWindows::deleteRecursiveShell(temporaryDirectory.c_str(), false);
+    for(size_t index = 0; index < this->temporary_directories.size(); index++) {
+        std::string &temporary_directory = this->temporary_directories[index];
+        JBWindows::DeleteRecursiveShell(temporary_directory.c_str(), false);
     }
 
-    for(size_t index = 0; index < this->temporaryFiles.size(); index++) {
-        std::string &temporaryFile = this->temporaryFiles[index];
-        DeleteFile(temporaryFile.c_str());
+    for(size_t index = 0; index < this->temporary_files.size(); index++) {
+        std::string &temporary_file = this->temporary_files[index];
+        DeleteFile(temporary_file.c_str());
     }
 
-    // prints an info message into the logger
-    JBLogger::getLogger("setup")->info("Finished deleting temporary files");
+    // prints an Info message into the logger
+    JBLogger::GetLogger("setup")->Info("Finished deleting temporary files");
 
     // closes (destroy) the window in the most correct procedure
     // this call is done to prevent pending handles
-    DestroyWindow(*this->handlerWindowReference);
+    DestroyWindow(*this->handler_window_reference);
 }
 
-void CSDownloader::setBaseDownloadAddress(std::string &baseDownloadAddress){
-    this->baseDownloadAddress = baseDownloadAddress;
+void CSDownloader::SetBaseDownloadAddress(std::string &base_download_address){
+    this->base_download_address = base_download_address;
 }
 
-void CSDownloader::addDownloadItem(CSDownloadItem &downloadItem) {
-    this->downloadItems.push_back(downloadItem);
+void CSDownloader::AddDownloadItem(CSDownloadItem &download_item) {
+    this->download_items.push_back(download_item);
 }
 
-CSDownloadItem &CSDownloader::addDownloadFile(std::string &name, std::string &description) {
-    CSDownloadItem downloadItem = CSDownloadItem(name, description, this->baseDownloadAddress + "/" + name);
+CSDownloadItem &CSDownloader::AddDownloadFile(std::string &name, std::string &description) {
+    CSDownloadItem download_item = CSDownloadItem(name, description, this->base_download_address + "/" + name);
 
-    this->downloadItems.push_back(downloadItem);
+    this->download_items.push_back(download_item);
 
-    return this->downloadItems.back();
+    return this->download_items.back();
 }
 
-std::string &CSDownloader::getDownloadItemFilePath(CSDownloadItem &downloadItem) {
-    std::string &downloadItemAddress = downloadItem.getAddress();
+std::string &CSDownloader::GetDownloadItemFilePath(CSDownloadItem &download_item) {
+    std::string &download_item_address = download_item.GetAddress();
 
-    std::string &filePath = this->downloadItemsFilePathMap[downloadItemAddress];
+    std::string &file_path = this->download_items_file_path_map[download_item_address];
 
-    return filePath;
+    return file_path;
 }

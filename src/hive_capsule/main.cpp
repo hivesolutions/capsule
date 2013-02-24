@@ -37,7 +37,8 @@ enum OperationsType {
     APPEND,
     EXTEND,
     POP,
-    DUMP
+    DUMP,
+	TEST
 };
 
 int Help(char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
@@ -354,6 +355,10 @@ int Dump(char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
     return 0;
 }
 
+int Test(char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
+    return 0;
+}
+
 int Call(enum OperationsType operation, char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
     switch(operation) {
         case HELP:
@@ -382,6 +387,10 @@ int Call(enum OperationsType operation, char **argv, int argc, HINSTANCE handler
 
         case DUMP:
             return Dump(argv, argc, handler_instance, cmd_show);
+            break;
+
+        case TEST:
+            return Test(argv, argc, handler_instance, cmd_show);
             break;
     }
 
@@ -434,6 +443,7 @@ int APIENTRY _tWinMain(HINSTANCE handler_instance, HINSTANCE prev_instance, LPTS
             else if(!strcmp(argv[1], "extend")) { operation = EXTEND; }
             else if(!strcmp(argv[1], "pop")) { operation = POP; }
             else if(!strcmp(argv[1], "dump")) { operation = DUMP; }
+			else if(!strcmp(argv[1], "test")) { operation = TEST; }
             else { throw "Invalid command line option"; }
         }
 

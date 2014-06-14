@@ -57,8 +57,7 @@ HRESULT CreateLink(LPCSTR path_object, LPCSTR path_link, LPCSTR working_director
     // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
     // has already been called.
     hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
-    if(SUCCEEDED(hres))
-    {
+    if(SUCCEEDED(hres)) {
         IPersistFile* ppf;
 
         // Set the path to the shortcut target and add the description.

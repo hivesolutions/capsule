@@ -223,9 +223,18 @@ std::string CSDownloader::UnpackFiles(std::string target_path) {
     // sends the message to change the label of the window,
     // then invalidates the window rectangle and after that
     // sends a message to change the progress bar to marquee
-    SendMessage(*this->handler_window_reference, change_label_event_value, (WPARAM) "Uncompressing installation files", NULL);
+    SendMessage(
+	    *this->handler_window_reference,
+		change_label_event_value,
+		(WPARAM) "Uncompressing installation files", NULL
+	);
     InvalidateRect(*this->handler_window_reference, NULL, true);
-    SendMessage(*this->handler_window_reference, change_progress_event_value, 2, NULL);
+    SendMessage(
+		*this->handler_window_reference,
+		change_progress_event_value,
+		2,
+		NULL
+	);
 
     if(target_path == "") {
         // allocates space for the file name

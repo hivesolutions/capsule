@@ -338,16 +338,12 @@ void CSDownloader::AddDownloadItem(CSDownloadItem &download_item) {
 
 CSDownloadItem &CSDownloader::AddDownloadFile(std::string &name, std::string &description) {
     CSDownloadItem download_item = CSDownloadItem(name, description, this->base_download_address + "/" + name);
-
     this->download_items.push_back(download_item);
-
     return this->download_items.back();
 }
 
 std::string &CSDownloader::GetDownloadItemFilePath(CSDownloadItem &download_item) {
     std::string &download_item_address = download_item.GetAddress();
-
     std::string &file_path = this->download_items_file_path_map[download_item_address];
-
     return file_path;
 }

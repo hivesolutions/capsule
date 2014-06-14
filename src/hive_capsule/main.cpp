@@ -448,7 +448,12 @@ int APIENTRY _tWinMain(HINSTANCE handler_instance, HINSTANCE prev_instance, LPTS
 
         Call(operation, argv, argc, handler_instance, cmd_show);
     } catch(char *exception) {
-        int return_value = MessageBox(NULL, (std::string("Error:\n") + exception).c_str(), "Installation error", MB_ICONERROR | MB_OK);
+        int return_value = MessageBox(
+			NULL,
+			(std::string("Error:\n") + exception).c_str(),
+			"Installation error",
+			MB_ICONERROR | MB_OK
+        );
         return -1;
     }
 

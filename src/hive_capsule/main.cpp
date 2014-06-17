@@ -49,42 +49,53 @@ int Help(char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
 
 
 
-HRESULT CreateLink(LPCSTR path_object, LPCSTR path_link, LPCSTR working_directory, LPCSTR description)
-{
-    HRESULT hres;
-    IShellLink* psl;
+HRESULT CreateLink(LPCSTR path_object, LPCSTR path_link, LPCSTR working_directory, LPCSTR description) {
+    // allocates space for the various files that are going to be
+    // used for the creation of the shortcut link in storage
+    HRESULT result;
+    IShellLink *shell_link;
+    IPersistFile *persist_file;
 
-    // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
-    // has already been called.
-    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
-    if(SUCCEEDED(hres)) {
-        IPersistFile* ppf;
+    // tries to retrieve a pointer to the shell interface, that
+    // is going to be used for the creation of the link (shortcuty)
+    result = CoCreateInstance(
+        CLSID_ShellLink,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_IShellLink,
+        (LPVOID *) &shell_link
+    );
+    if(SUCCEEDED(result) == FALSE) { return result; }
 
-        // Set the path to the shortcut target and add the description.
-        psl->SetPath(path_object);
-        psl->SetDescription(description);
-        psl->SetWorkingDirectory(working_directory);
+    // sets the path to the shortcut target and adds the description
+    // this should correctly identify the shortcut to be created
+    shell_link->SetPath(path_object);
+    shell_link->SetDescription(description);
+    shell_link->SetWorkingDirectory(working_directory);
 
-        // Query IShellLink for the IPersistFile interface, used for saving the
-        // shortcut in persistent storage.
-        hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
-
-        if(SUCCEEDED(hres)) {
-            WCHAR wsz[MAX_PATH];
-
-            // Ensure that the string is Unicode.
-            MultiByteToWideChar(CP_ACP, 0, path_link, -1, wsz, MAX_PATH);
-
-            // Add code here to check return value from MultiByteWideChar
-            // for success.
-
-            // Save the link by calling IPersistFile::Save.
-            hres = ppf->Save(wsz, TRUE);
-            ppf->Release();
-        }
-        psl->Release();
+    // queries the shell link for the persist file interface, used for
+    // saving the shortcut in persistent storage
+    result = shell_link->QueryInterface(IID_IPersistFile, (LPVOID *) &persist_file);
+    if(SUCCEEDED(result) == FALSE) {
+        shell_link->Release();
+        return result;
     }
-    return hres;
+
+    // allocates space for the wide version of the path link
+    // that is going to be used to store the shortcut data
+    WCHAR path_link_w[MAX_PATH];
+
+    // ensures that the string isof type unicode, required for
+    // the creation of the link file (shortcut) and then saves
+    // it, persisting it to the current user's interface
+    MultiByteToWideChar(CP_ACP, 0, path_link, -1, path_link_w, MAX_PATH);
+    result = persist_file->Save(path_link_w, TRUE);
+
+    // releases the complete set of resources and returns the
+    // last result to the caller method/function
+    persist_file->Release();
+    shell_link->Release();
+    return result;
 }
 
 

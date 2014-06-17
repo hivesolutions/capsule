@@ -141,7 +141,11 @@ void CSDownloader::DownloadItem(CSDownloadItem &download_item) {
 
     // opens the file for read and write, writes the contents to the file
     // and closes it (avoid leaking)
-    std::fstream file = std::fstream(file_name, std::fstream::in | std::fstream::out | std::fstream::trunc | std::fstream::binary);
+    std::fstream file = std::fstream(
+	    file_name,
+		std::fstream::in | std::fstream::out |
+		std::fstream::trunc | std::fstream::binary
+	);
     file.write(http_client.GetMessageBuffer(), http_client.GetMessageSize());
     file.close();
 

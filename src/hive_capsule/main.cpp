@@ -49,7 +49,12 @@ int Help(char **argv, int argc, HINSTANCE handler_instance, int cmd_show) {
 
 
 
-HRESULT CreateLink(LPCSTR path_object, LPCSTR path_link, LPCSTR working_directory, LPCSTR description) {
+HRESULT CreateLink(
+    LPCSTR path_object,
+    LPCSTR path_link,
+    LPCSTR working_directory,
+    LPCSTR description
+) {
     // allocates space for the various files that are going to be
     // used for the creation of the shortcut link in storage
     HRESULT result;

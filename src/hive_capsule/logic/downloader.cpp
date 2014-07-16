@@ -142,10 +142,10 @@ void CSDownloader::DownloadItem(CSDownloadItem &download_item) {
     // opens the file for read and write, writes the contents to the file
     // and closes it (avoid leaking)
     std::fstream file = std::fstream(
-	    file_name,
-		std::fstream::in | std::fstream::out |
-		std::fstream::trunc | std::fstream::binary
-	);
+        file_name,
+        std::fstream::in | std::fstream::out |
+        std::fstream::trunc | std::fstream::binary
+    );
     file.write(http_client.GetMessageBuffer(), http_client.GetMessageSize());
     file.close();
 
@@ -228,17 +228,17 @@ std::string CSDownloader::UnpackFiles(std::string target_path) {
     // then invalidates the window rectangle and after that
     // sends a message to change the progress bar to marquee
     SendMessage(
-	    *this->handler_window_reference,
-		change_label_event_value,
-		(WPARAM) "Uncompressing installation files", NULL
-	);
+        *this->handler_window_reference,
+        change_label_event_value,
+        (WPARAM) "Uncompressing installation files", NULL
+    );
     InvalidateRect(*this->handler_window_reference, NULL, true);
     SendMessage(
-		*this->handler_window_reference,
-		change_progress_event_value,
-		2,
-		NULL
-	);
+        *this->handler_window_reference,
+        change_progress_event_value,
+        2,
+        NULL
+    );
 
     if(target_path == "") {
         // allocates space for the file name

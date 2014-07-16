@@ -136,13 +136,13 @@ void CSData::SetBuffer(char *file_path, struct DataType *data) {
 
     HANDLE resource = BeginUpdateResource(file_path, false);
     BOOL success = UpdateResource(
-		resource,
-		RT_RCDATA,
-		"BUFFER",
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		buffer,
-		buffer_size
-	);
+        resource,
+        RT_RCDATA,
+        "BUFFER",
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        buffer,
+        buffer_size
+    );
 
     if(success == TRUE) {
         EndUpdateResource(resource, FALSE);

@@ -2,5 +2,5 @@
 *.user
 *.suo
 
-/bin/
+/bin
 /win32/vs2008ex/*/*
